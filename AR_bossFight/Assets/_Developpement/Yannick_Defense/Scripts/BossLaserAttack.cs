@@ -3,80 +3,112 @@ using System.Collections;
 
 public class BossLaserAttack : MonoBehaviour
 {
-    [Header("Réglages")]
-    public Transform targetPlayer; // Glisse le XR Origin ici
+    [Header("Réglages Combat")]
+    public Transform targetPlayer;
     public float damage = 20f;
-    public float laserDuration = 0.2f; // Temps d'affichage du laser
-    public float range = 50f;
+    public float attackRange = 50f;
 
-    [Header("Composants")]
+    [Header("Timing")]
+    public float chargeTime = 4.0f; // Durée du chargement
+    public float lockTime = 0.5f;   // Temps avant le tir où le boss arrête de bouger (pour esquiver)
+    public float laserDuration = 0.5f;
+
+    [Header("Visuels")]
     public LineRenderer laserLine;
+    public GameObject chargeOrb;
+    public float maxOrbSize = 3.0f;
+
+    private bool isAttacking = false;
 
     void Update()
     {
-        // Le Boss regarde toujours le joueur (flippant !)
-        if (targetPlayer != null)
-        {
-            transform.LookAt(targetPlayer);
-        }
+        // On a retiré le LookAt d'ici ! 
+        // Le boss ne regarde le joueur QUE quand il décide d'attaquer.
 
-        // TEST : Appuie sur ENTRÉE pour tirer
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) && !isAttacking)
         {
-            ShootLaser();
+            StartCoroutine(PerformAttackSequence());
         }
     }
 
-    void ShootLaser()
+    IEnumerator PerformAttackSequence()
     {
-        // 1. On allume le visuel
-        StartCoroutine(FireEffect());
+        isAttacking = true;
 
-        // 2. On prépare le Raycast (Un rayon invisible qui part tout droit)
-        RaycastHit hit;
-        // Ça part de moi (transform.position) vers l'avant (transform.forward)
-        if (Physics.Raycast(transform.position, transform.forward, out hit, range))
+        Debug.Log("⚠️ CHARGE EN COURS...");
+        chargeOrb.SetActive(true);
+
+        float timer = 0f;
+
+        // --- PHASE 1 : TRACKING (Le Boss te suit du regard) ---
+        // On boucle tant qu'on n'a pas atteint le moment de "Verrouiller" la visée
+        float timeToStopTracking = chargeTime - lockTime;
+
+        while (timer < chargeTime)
         {
-            Debug.Log("J'ai touché : " + hit.collider.name);
+            timer += Time.deltaTime;
 
-            // CAS 1 : On touche le BOUCLIER
-            if (hit.collider.CompareTag("Shield"))
+            // 1. Grossissement de la boule
+            float progress = timer / chargeTime;
+            chargeOrb.transform.localScale = Vector3.one * progress * maxOrbSize;
+
+            // 2. Rotation vers le joueur (Seulement si on n'a pas encore verrouillé)
+            // 2. Rotation vers le joueur
+            if (timer < timeToStopTracking && targetPlayer != null)
             {
-                Debug.Log("🛡️ TIR BLOQUÉ PAR LE BOUCLIER !");
-                // Ici on pourrait mettre des étincelles bleues
+                // CORRECTION : On regarde directement le point cible (donc vers le bas si tu es plus bas)
+                this.transform.LookAt(targetPlayer.position);
             }
-            // CAS 2 : On touche le JOUEUR
-            else if (hit.collider.CompareTag("Player"))
+            else if (timer >= timeToStopTracking && timer < timeToStopTracking + Time.deltaTime)
             {
-                Debug.Log("🔥 JOUEUR BRÛLÉ !");
-
-                // On essaie de trouver le script de vie sur le joueur touché
-                PlayerHealth hp = hit.collider.GetComponent<PlayerHealth>();
-                // Si pas sur le collider, cherche sur le parent (XR Origin)
-                if (hp == null) hp = hit.collider.GetComponentInParent<PlayerHealth>();
-
-                if (hp != null)
-                {
-                    hp.TakeDamage((int)damage);
-                }
+                // Juste un petit log au moment précis où il arrête de suivre
+                Debug.Log("🔒 VISÉE VERROUILLÉE ! BOUGEZ !");
+                // On change la couleur de la boule en blanc pour prévenir ? (Optionnel)
             }
+
+            yield return null;
         }
-    }
 
-    // Petite coroutine pour afficher le laser juste un instant (comme un éclair)
-    IEnumerator FireEffect()
-    {
-        laserLine.enabled = true;
-        laserLine.SetPosition(0, transform.position); // Départ du laser (Boss)
+        // --- PHASE 2 : TIR (Dans la direction verrouillée) ---
+        chargeOrb.SetActive(false);
+        FireLaserRaycast();
 
-        // On vise le joueur pour le dessin (ou le point d'impact si on veut être précis)
-        // Pour simplifier l'effet visuel ici, on trace juste une ligne vers le joueur
-        if (targetPlayer != null)
-            laserLine.SetPosition(1, targetPlayer.position);
-        else
-            laserLine.SetPosition(1, transform.position + transform.forward * range);
-
+        // --- PHASE 3 : COOLDOWN ---
         yield return new WaitForSeconds(laserDuration);
         laserLine.enabled = false;
+        isAttacking = false;
+    }
+
+    void FireLaserRaycast()
+    {
+        Debug.Log("Piu Piu ! Je tire le laser maintenant !");
+        laserLine.enabled = true;
+        laserLine.SetPosition(0, transform.position);
+
+        RaycastHit hit;
+        // Le rayon part tout droit devant le nez du boss (qui ne bouge plus depuis 0.5s)
+        if (Physics.Raycast(transform.position, transform.forward, out hit, attackRange))
+        {
+            laserLine.SetPosition(1, hit.point);
+
+            if (hit.collider.CompareTag("Shield"))
+            {
+                Debug.Log("🛡️ BLOQUÉ !");
+            }
+            else if (hit.collider.CompareTag("Player"))
+            {
+                Debug.Log("🔥 JOUEUR TOUCHÉ !");
+                PlayerHealth hp = hit.collider.GetComponent<PlayerHealth>();
+                if (hp == null) hp = hit.collider.GetComponentInParent<PlayerHealth>(); // Cherche sur le parent (XR Origin)
+
+                if (hp != null) hp.TakeDamage((int)damage);
+            }
+        }
+        else
+        {
+            // Tir dans le vide (ESQUIVE RÉUSSIE)
+            laserLine.SetPosition(1, transform.position + transform.forward * attackRange);
+            Debug.Log("💨 ESQUIVÉ !");
+        }
     }
 }
