@@ -4,13 +4,13 @@ using System.Collections;
 public class BossLaserAttack : MonoBehaviour
 {
     [Header("Réglages Combat")]
-    public Transform targetPlayer;
+    public Transform targetPlayer; // Ton objet "TargetPoint" (le cou)
     public float damage = 20f;
     public float attackRange = 50f;
 
     [Header("Timing")]
-    public float chargeTime = 4.0f; // Durée du chargement
-    public float lockTime = 0.5f;   // Temps avant le tir où le boss arrête de bouger (pour esquiver)
+    public float chargeTime = 4.0f;
+    public float lockTime = 0.5f;   // Temps de "gel" avant le tir
     public float laserDuration = 0.5f;
 
     [Header("Visuels")]
@@ -19,12 +19,18 @@ public class BossLaserAttack : MonoBehaviour
     public float maxOrbSize = 3.0f;
 
     private bool isAttacking = false;
+    private bool isLocked = false; // Nouvelle variable pour savoir quand arrêter de tourner
 
     void Update()
     {
-        // On a retiré le LookAt d'ici ! 
-        // Le boss ne regarde le joueur QUE quand il décide d'attaquer.
+        // LOGIQUE PERMANENTE : Le Boss te regarde TOUT LE TEMPS...
+        // Sauf s'il est "verrouillé" (prêt à tirer)
+        if (targetPlayer != null && !isLocked)
+        {
+            transform.LookAt(targetPlayer);
+        }
 
+        // Lancer l'attaque
         if (Input.GetKeyDown(KeyCode.Return) && !isAttacking)
         {
             StartCoroutine(PerformAttackSequence());
@@ -34,60 +40,59 @@ public class BossLaserAttack : MonoBehaviour
     IEnumerator PerformAttackSequence()
     {
         isAttacking = true;
+        isLocked = false; // Au début de la charge, il continue de te suivre
 
-        Debug.Log("⚠️ CHARGE EN COURS...");
+        Debug.Log("⚠️ CHARGE...");
         chargeOrb.SetActive(true);
 
         float timer = 0f;
-
-        // --- PHASE 1 : TRACKING (Le Boss te suit du regard) ---
-        // On boucle tant qu'on n'a pas atteint le moment de "Verrouiller" la visée
-        float timeToStopTracking = chargeTime - lockTime;
+        float timeToLock = chargeTime - lockTime;
 
         while (timer < chargeTime)
         {
             timer += Time.deltaTime;
 
-            // 1. Grossissement de la boule
+            // Animation de la boule
             float progress = timer / chargeTime;
             chargeOrb.transform.localScale = Vector3.one * progress * maxOrbSize;
 
-            // 2. Rotation vers le joueur (Seulement si on n'a pas encore verrouillé)
-            // 2. Rotation vers le joueur
-            if (timer < timeToStopTracking && targetPlayer != null)
+            // EST-CE QU'ON DOIT VERROUILLER LA VISÉE ?
+            if (timer >= timeToLock && !isLocked)
             {
-                // CORRECTION : On regarde directement le point cible (donc vers le bas si tu es plus bas)
-                this.transform.LookAt(targetPlayer.position);
-            }
-            else if (timer >= timeToStopTracking && timer < timeToStopTracking + Time.deltaTime)
-            {
-                // Juste un petit log au moment précis où il arrête de suivre
-                Debug.Log("🔒 VISÉE VERROUILLÉE ! BOUGEZ !");
-                // On change la couleur de la boule en blanc pour prévenir ? (Optionnel)
+                isLocked = true; // STOP ! On ne bouge plus le regard dans l'Update
+                Debug.Log("🔒 LOCKED ! ESQUIVEZ !");
+                // Petit effet visuel optionnel : la boule devient blanche
+                chargeOrb.GetComponent<Renderer>().material.color = Color.white;
             }
 
             yield return null;
         }
 
-        // --- PHASE 2 : TIR (Dans la direction verrouillée) ---
+        // TIR
         chargeOrb.SetActive(false);
         FireLaserRaycast();
 
-        // --- PHASE 3 : COOLDOWN ---
+        // FIN
         yield return new WaitForSeconds(laserDuration);
         laserLine.enabled = false;
+
+        // Reset pour la prochaine fois
         isAttacking = false;
+        isLocked = false;
+        // Remettre la couleur rouge si tu l'avais changée
+        chargeOrb.GetComponent<Renderer>().material.color = Color.red;
     }
 
     void FireLaserRaycast()
     {
-        Debug.Log("Piu Piu ! Je tire le laser maintenant !");
+        // Point de départ décalé pour ne pas se tirer dessus
+        Vector3 startPoint = transform.position + (transform.forward * 1.5f);
+
         laserLine.enabled = true;
-        laserLine.SetPosition(0, transform.position);
+        laserLine.SetPosition(0, startPoint);
 
         RaycastHit hit;
-        // Le rayon part tout droit devant le nez du boss (qui ne bouge plus depuis 0.5s)
-        if (Physics.Raycast(transform.position, transform.forward, out hit, attackRange))
+        if (Physics.Raycast(startPoint, transform.forward, out hit, attackRange))
         {
             laserLine.SetPosition(1, hit.point);
 
@@ -98,16 +103,15 @@ public class BossLaserAttack : MonoBehaviour
             else if (hit.collider.CompareTag("Player"))
             {
                 Debug.Log("🔥 JOUEUR TOUCHÉ !");
+                // Logique de dégâts inchangée
                 PlayerHealth hp = hit.collider.GetComponent<PlayerHealth>();
-                if (hp == null) hp = hit.collider.GetComponentInParent<PlayerHealth>(); // Cherche sur le parent (XR Origin)
-
+                if (hp == null) hp = hit.collider.GetComponentInParent<PlayerHealth>();
                 if (hp != null) hp.TakeDamage((int)damage);
             }
         }
         else
         {
-            // Tir dans le vide (ESQUIVE RÉUSSIE)
-            laserLine.SetPosition(1, transform.position + transform.forward * attackRange);
+            laserLine.SetPosition(1, startPoint + transform.forward * attackRange);
             Debug.Log("💨 ESQUIVÉ !");
         }
     }
