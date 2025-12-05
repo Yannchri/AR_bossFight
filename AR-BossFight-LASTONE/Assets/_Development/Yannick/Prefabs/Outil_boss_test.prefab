@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2252370694580997941
+--- !u!1 &3758140162813278245
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,12 +8,12 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6602491386243887726}
-  - component: {fileID: 2472611827066384771}
-  - component: {fileID: 7985650293808124631}
-  - component: {fileID: 5135906714973168176}
-  - component: {fileID: 5402156898400061809}
-  - component: {fileID: 3639576680466591415}
+  - component: {fileID: 6259165697780120267}
+  - component: {fileID: 3320715903895393394}
+  - component: {fileID: 8466598368192422429}
+  - component: {fileID: 2484063113358046532}
+  - component: {fileID: 115008137638809454}
+  - component: {fileID: 6736948908110105832}
   m_Layer: 0
   m_Name: Outil_boss_test
   m_TagString: Untagged
@@ -21,36 +21,36 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6602491386243887726
+--- !u!4 &6259165697780120267
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2252370694580997941}
+  m_GameObject: {fileID: 3758140162813278245}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 5}
+  m_LocalPosition: {x: 0, y: 1.75, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &2472611827066384771
+--- !u!33 &3320715903895393394
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2252370694580997941}
+  m_GameObject: {fileID: 3758140162813278245}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &7985650293808124631
+--- !u!23 &8466598368192422429
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2252370694580997941}
+  m_GameObject: {fileID: 3758140162813278245}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -92,13 +92,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &5135906714973168176
+--- !u!65 &2484063113358046532
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2252370694580997941}
+  m_GameObject: {fileID: 3758140162813278245}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -113,14 +113,14 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!120 &5402156898400061809
+--- !u!120 &115008137638809454
 LineRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2252370694580997941}
+  m_GameObject: {fileID: 3758140162813278245}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -184,7 +184,7 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 1}
+      key0: {r: 0.83396226, g: 0.15673733, b: 0.12430749, a: 1}
       key1: {r: 1, g: 1, b: 1, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
@@ -209,7 +209,7 @@ LineRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
-      m_ColorSpace: -1
+      m_ColorSpace: 0
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
@@ -223,17 +223,18 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &3639576680466591415
+--- !u!114 &6736948908110105832
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2252370694580997941}
+  m_GameObject: {fileID: 3758140162813278245}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d217b956e59ba14d83466550378bcd7, type: 3}
+  m_Script: {fileID: 11500000, guid: 3b65bb06ee5f5ea43bc4c5bd515e8a31, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BossAttackTester
-  playerHead: {fileID: 0}
-  laserLine: {fileID: 5402156898400061809}
+  m_EditorClassIdentifier: '::'
+  targetHead: {fileID: 0}
+  damageUI: {fileID: 0}
+  laserLine: {fileID: 115008137638809454}
