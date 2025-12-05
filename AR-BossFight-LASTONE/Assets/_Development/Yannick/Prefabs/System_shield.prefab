@@ -162,6 +162,6 @@ MonoBehaviour:
   handTracking: {fileID: 0}
   controllerType: 1
   pinchThresholdOn: 0.5
-  pinchThresholdOff: 0.4
+  pinchThresholdOff: 0.15
   useKeyboardDebug: 1
   debugKey: 115
