@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 6192176335492942566}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.03, z: 0.08}
   m_LocalScale: {x: 0.4, y: 0.019999998, z: 0.40000004}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -159,6 +159,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   shieldVisual: {fileID: 6192176335492942566}
-  gripThreshold: 0.8
+  handTracking: {fileID: 0}
+  controllerType: 1
+  pinchThresholdOn: 0.5
+  pinchThresholdOff: 0.4
   useKeyboardDebug: 1
   debugKey: 115
