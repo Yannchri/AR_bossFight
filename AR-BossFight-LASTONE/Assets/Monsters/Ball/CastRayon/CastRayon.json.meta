@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream:AR-BossFight-LASTONE/Assets/Monsters/Ball/CastRayon/CastRayon.json.meta
 guid: 7283bc00fdf2a074180ea3f231347c32
+=======
+guid: 61c2b74490ed871408aeda18426b9d7f
+>>>>>>> Stashed changes:AR-BossFight-LASTONE/Assets/Resources/PerformanceTestRunInfo.json.meta
 TextScriptImporter:
   externalObjects: {}
   userData: 

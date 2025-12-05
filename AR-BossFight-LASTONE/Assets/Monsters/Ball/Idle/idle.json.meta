@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream:AR-BossFight-LASTONE/Assets/Monsters/Ball/Idle/idle.json.meta
 guid: a49f94361c7b4e846a8720f0be8ed181
+=======
+guid: aaa438cf49362874cb0ccb9946e52ae8
+>>>>>>> Stashed changes:AR-BossFight-LASTONE/Assets/Resources/PerformanceTestRunSettings.json.meta
 TextScriptImporter:
   externalObjects: {}
   userData: 
