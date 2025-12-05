@@ -1,24 +1,52 @@
 ﻿using UnityEngine;
+using System.Collections; // Nécessaire pour les Coroutines
 
 public class BossAimAndShootForShield : MonoBehaviour
 {
-    public Transform targetHead; // Ta Main Camera
-    public DamageUI damageUI;    // Ton Canvas
+    [Header("Cibles et Visuels")]
+    public Transform targetHead;
+    public DamageUI damageUI;
     public LineRenderer laserLine;
+
+    [Header("Animation")]
+    public Animator bossAnimator; // GLISSE TON BOSS ICI
+    public Transform laserOrigin; // Le point de départ du tir (le bâton ou l'œil)
+
+    [Header("Réglages")]
+    public float delayBeforeShot = 0.5f; // Temps pour synchroniser avec l'anim (à régler)
 
     void Update()
     {
-        // 1. VISUEL : Le boss regarde le joueur (pour faire joli)
+        // 1. VISUEL : Le boss regarde le joueur
         if (targetHead != null)
         {
-            transform.LookAt(targetHead);
+            // On tourne tout le boss vers le joueur
+            transform.LookAt(new Vector3(targetHead.position.x, transform.position.y, targetHead.position.z));
+
+            // Si tu as un objet "LaserOrigin" (ex: un oeil), tu peux le faire regarder aussi
+            if (laserOrigin != null) laserOrigin.LookAt(targetHead);
         }
 
         // 2. TIR (Touche Entrée)
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            ShootAtTarget();
+            StartCoroutine(PrepareAttack());
         }
+    }
+
+    IEnumerator PrepareAttack()
+    {
+        // 1. On lance l'animation
+        if (bossAnimator != null)
+        {
+            bossAnimator.SetTrigger("Shoot"); // Le nom du paramètre créé à l'étape 3
+        }
+
+        // 2. On attend que le bras se lève (règle le temps "delayBeforeShot" dans l'inspector)
+        yield return new WaitForSeconds(delayBeforeShot);
+
+        // 3. On tire le laser !
+        ShootAtTarget();
     }
 
     void ShootAtTarget()
@@ -27,40 +55,30 @@ public class BossAimAndShootForShield : MonoBehaviour
 
         laserLine.enabled = true;
 
-        // POINT DE DÉPART : Le centre du Boss (ou un peu devant)
-        Vector3 startPoint = transform.position;
+        // POINT DE DÉPART : Priorité à laserOrigin, sinon le centre du boss
+        Vector3 startPoint = (laserOrigin != null) ? laserOrigin.position : transform.position;
+
         laserLine.SetPosition(0, startPoint);
 
-        // --- LA MAGIE MATHEMATIQUE ---
-        // On calcule le vecteur exact qui relie le Boss à la Tête
-        // Direction = Destination - Départ
         Vector3 exactDirection = (targetHead.position - startPoint).normalized;
-
         RaycastHit hit;
 
-        // On tire le rayon dans cette Direction Exacte (pas juste "devant le boss")
         if (Physics.Raycast(startPoint, exactDirection, out hit, 100f))
         {
             laserLine.SetPosition(1, hit.point);
 
-            // --- ANALYSE ---
             if (hit.collider.CompareTag("Shield"))
             {
                 Debug.Log("🛡️ BLOQUÉ par le bouclier !");
             }
             else if (hit.collider.CompareTag("Player"))
             {
-                Debug.Log("🔥 TÊTE TOUCHÉE (En plein dans le mille) !");
+                Debug.Log("🔥 TÊTE TOUCHÉE !");
                 if (damageUI != null) damageUI.ShowHitEffect();
-            }
-            else
-            {
-                Debug.Log("⚠️ Touché obstacle : " + hit.collider.name);
             }
         }
         else
         {
-            // Si on ne touche rien (trop loin ?)
             laserLine.SetPosition(1, startPoint + exactDirection * 20f);
         }
 
