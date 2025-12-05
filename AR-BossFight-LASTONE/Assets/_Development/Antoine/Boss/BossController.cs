@@ -16,11 +16,33 @@ public class BossController : MonoBehaviour
     public float attackCooldown = 3.0f; // Temps d'attente entre deux attaques
     private float cooldownTimer;
 
+    [Header("Attaque Boule de Feu")]
+    public GameObject fireballPrefab; // Prefab de la boule de feu
+    public float fireballSpeed = 8f; // Vitesse de la boule de feu
+
     void Start()
     {
-        // En AR, le joueur est souvent la caméra principale
-        if (playerHead == null && Camera.main != null) 
-            playerHead = Camera.main.transform;
+        // Chercher le joueur/caméra automatiquement
+        if (playerHead == null)
+        {
+            // Méthode 1 : Chercher le composant OVRCameraRig (Meta Quest)
+            OVRCameraRig ovrCameraRig = FindFirstObjectByType<OVRCameraRig>();
+            if (ovrCameraRig != null)
+            {
+                playerHead = ovrCameraRig.centerEyeAnchor;
+                Debug.Log("Boss: OVRCameraRig trouvé, utilisé comme cible !");
+            }
+            // Méthode 2 : Fallback sur la caméra principale
+            else if (Camera.main != null)
+            {
+                playerHead = Camera.main.transform;
+                Debug.Log("Boss: Camera principale utilisée comme cible !");
+            }
+            else
+            {
+                Debug.LogError("Boss: Impossible de trouver une cible de joueur !");
+            }
+        }
             
         // On initialise le timer pour qu'il attaque peu de temps après le début
         cooldownTimer = attackCooldown;
@@ -43,15 +65,12 @@ public class BossController : MonoBehaviour
             case BossState.Idle:
                 HandleIdleState();
                 break;
-            
             case BossState.Chasing:
                 // Logique de poursuite ici (si le boss bouge)
                 break;
-
             case BossState.Attacking:
                 // On ne fait rien ici, l'attaque est gérée par la Coroutine
                 break;
-                
             case BossState.Dead:
                 // Ne rien faire ou jouer animation de mort
                 break;
@@ -59,6 +78,26 @@ public class BossController : MonoBehaviour
     }
 
     // --- LOGIQUE DES ÉTATS ---
+
+    // Méthode pour lancer une boule de feu vers le joueur
+    private void LaunchFireball()
+    {
+        if (fireballPrefab == null || playerHead == null) return;
+        // Instancie la boule de feu à la position du boss
+        GameObject fireball = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
+        // Calcule la direction vers le joueur
+        Vector3 direction = (playerHead.position - transform.position).normalized;
+        // Ajoute un Rigidbody si absent
+        Rigidbody rb = fireball.GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            rb = fireball.AddComponent<Rigidbody>();
+        }
+        rb.useGravity = false;
+        rb.linearVelocity = direction * fireballSpeed;
+        // Détruit la boule de feu après 5 secondes
+        Destroy(fireball, 5f);
+    }
 
     void HandleIdleState()
     {
@@ -85,10 +124,13 @@ public class BossController : MonoBehaviour
         // 2. On fait apparaître la Zone
         SpawnZoneAttack();
 
-        // 3. On attend la fin de l'attaque (ex: 1s de récupération)
+        // 3. On lance la boule de feu
+        LaunchFireball();
+
+        // 4. On attend la fin de l'attaque (ex: 1s de récupération)
         yield return new WaitForSeconds(1.0f);
 
-        // 4. Reset : On remet le timer et on repasse en Idle
+        // 5. Reset : On remet le timer et on repasse en Idle
         cooldownTimer = attackCooldown;
         ChangeState(BossState.Idle);
     }
