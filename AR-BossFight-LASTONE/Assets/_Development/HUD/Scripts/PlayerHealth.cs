@@ -25,6 +25,14 @@ public class PlayerHealth : MonoBehaviour
             Die();
     }
 
+    public void Heal(float amount)
+    {
+        currentHealth += amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+        UpdateUI();
+    }
+
     void UpdateUI()
     {
         if (healthUI != null)
