@@ -9,123 +9,127 @@ public class BossController : MonoBehaviour
     [Header("État")]
     public BossState currentState;
 
+    [Header("Animation")]
+    public Animator bossAnimator; // GLISSE TON ANIMATOR ICI
+
     [Header("Cibles")]
     public Transform playerHead;
 
     [Header("Paramètres Généraux")]
-    public float attackCooldown = 3.0f; // Temps de pause entre les attaques
+    public float attackCooldown = 3.0f;
     private float cooldownTimer;
 
     [Header("Attaque 1 : Zone au sol (Prefab)")]
     public GameObject zoneAttackPrefab;
+    public float delayZoneSpawn = 0.5f; // Délai pour synchro avec l'anim "Frappe au sol"
 
     [Header("Attaque 2 : Boule de Feu (Prefab)")]
     public GameObject fireballPrefab;
     public float fireballSpeed = 8f;
+    public float delayFireballLaunch = 0.3f; // Délai pour synchro avec l'anim "Lancer"
 
     [Header("Attaque 3 : Rayon Laser (Objet Enfant)")]
-    public GameObject laserEmitterObject; // Glisse l'objet "LaserEmitter" qui est DANS le boss ici
-    public float laserRotationDuration = 4.0f; // Temps pour faire un tour complet
+    public GameObject laserEmitterObject;
+    public float laserRotationDuration = 4.0f;
 
     [Header("Attaque 4 : Charge (Dash)")]
-    public float dashSpeed = 20f;      // Vitesse très rapide
-    public float dashOvershoot = 5f;   // Distance à parcourir DERRIÈRE le joueur
-    public float dashPreparationTime = 1.0f; // Temps où le boss "charge" son attaque sur place
+    public float dashSpeed = 20f;
+    public float dashOvershoot = 5f;
+    public float dashPreparationTime = 1.0f;
 
     [Header("Réalité Mixte")]
     public MRUKRoom currentRoom;
 
     void Start()
     {
-        // --- 1. Recherche automatique du joueur (VR ou Écran) ---
+        // --- 1. Recherche automatique ---
         if (playerHead == null)
         {
             OVRCameraRig ovrCameraRig = FindFirstObjectByType<OVRCameraRig>();
-            if (ovrCameraRig != null)
-            {
-                playerHead = ovrCameraRig.centerEyeAnchor;
-            }
-            else if (Camera.main != null)
-            {
-                playerHead = Camera.main.transform;
-            }
+            if (ovrCameraRig != null) playerHead = ovrCameraRig.centerEyeAnchor;
+            else if (Camera.main != null) playerHead = Camera.main.transform;
         }
 
-        // --- 2. Initialisation ---
-        // On s'assure que le laser est éteint au début
-        if (laserEmitterObject != null) laserEmitterObject.SetActive(false);
+        // Recherche auto de l'animator si oublié
+        if (bossAnimator == null) bossAnimator = GetComponentInChildren<Animator>();
 
+        if (laserEmitterObject != null) laserEmitterObject.SetActive(false);
         cooldownTimer = attackCooldown;
         ChangeState(BossState.Idle);
     }
 
     void Update()
     {
-        // COMPORTEMENT : Regarder le joueur
-        // IMPORTANT : On NE regarde PAS le joueur si on est en train de faire l'attaque Laser (sinon le boss ne tourne pas)
+        // On ne regarde pas le joueur si on est en train de faire le Laser (car on tourne sur soi-même)
+        // Ni si on est en train de dasher (IsDashing) pour garder la trajectoire rectiligne visuelle
         bool isLaserAttacking = (currentState == BossState.Attacking && laserEmitterObject != null && laserEmitterObject.activeSelf);
+        bool isDashing = (currentState == BossState.Attacking && bossAnimator != null && bossAnimator.GetBool("IsDashing"));
 
-        if (playerHead != null && !isLaserAttacking)
+        if (playerHead != null && !isLaserAttacking && !isDashing)
         {
-            // On regarde le joueur, mais on reste droit (on ne penche pas en haut/bas)
-            Vector3 targetPosition = new Vector3(playerHead.position.x, this.transform.position.y, playerHead.position.z);
-            this.transform.LookAt(targetPosition);
+            // Rotation fluide vers le joueur mais bloquée sur Y
+            Vector3 targetPosition = new Vector3(playerHead.position.x, transform.position.y, playerHead.position.z);
+            transform.LookAt(targetPosition);
         }
 
-        // MACHINE A ÉTATS
         switch (currentState)
         {
             case BossState.Idle:
                 HandleIdleState();
                 break;
-            // Les autres états sont gérés par les Coroutines
         }
     }
 
-    // --- GESTION DU TEMPS ---
     void HandleIdleState()
     {
         cooldownTimer -= Time.deltaTime;
+
+        // Petite sécurité : s'assurer que l'animator sait qu'on est idle
+        // (Optionnel si tes transitions sont bien faites)
+
         if (cooldownTimer <= 0)
         {
             StartCoroutine(AttackRoutine());
         }
     }
 
-    // --- CERVEAU DES ATTAQUES ---
     IEnumerator AttackRoutine()
     {
         ChangeState(BossState.Attacking);
-        yield return new WaitForSeconds(0.5f); // Petite pause avant d'agir
+        yield return new WaitForSeconds(0.2f);
 
-        // CHOIX ALÉATOIRE DE L'ATTAQUE (0, 1 ou 2)
-       int diceRoll = Random.Range(0, 4); 
+        int diceRoll = Random.Range(0, 4);
 
-        if (diceRoll == 0)
+        if (diceRoll == 0) // BOULE DE FEU
         {
-            // ... (Code Boule de feu existant) ...
             Debug.Log("Boss : Attaque Boule de Feu !");
+            // 1. Déclencher l'anim
+            if (bossAnimator) bossAnimator.SetTrigger("AttackFireball");
+
+            // 2. Attendre le moment précis de l'anim (le "Release")
+            yield return new WaitForSeconds(delayFireballLaunch);
+
             LaunchFireball();
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.5f); // Finir l'anim
         }
-        else if (diceRoll == 1)
+        else if (diceRoll == 1) // ZONE AU SOL
         {
-            // ... (Code Zone au sol existant) ...
             Debug.Log("Boss : Attaque Zone au Sol !");
+            if (bossAnimator) bossAnimator.SetTrigger("AttackZone");
+
+            yield return new WaitForSeconds(delayZoneSpawn); // Attendre que le poing touche le sol visuellement
+
             SpawnZoneAttack();
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSeconds(1.0f);
         }
-        else if (diceRoll == 2)
+        else if (diceRoll == 2) // LASER
         {
-            // ... (Code Laser existant) ...
             Debug.Log("Boss : Attaque LASER ROTATIF !");
             yield return StartCoroutine(LaserSpinAttackRoutine());
-            yield return new WaitForSeconds(0.6f);
         }
-        else // NOUVEAU CAS : diceRoll == 3
+        else // CHARGE
         {
             Debug.Log("Boss : Attaque CHARGE !");
-            // Le script Update() arrêtera de regarder le joueur car on est en Attacking
             yield return StartCoroutine(DashAttackRoutine());
         }
 
@@ -133,109 +137,102 @@ public class BossController : MonoBehaviour
         ChangeState(BossState.Idle);
     }
 
-    // --- LOGIQUE SPÉCIFIQUE DES ATTAQUES ---
+    // --- LOGIQUE SPÉCIFIQUE ---
 
-    // 1. BOULE DE FEU
     void LaunchFireball()
     {
         if (fireballPrefab == null || playerHead == null) return;
+        // Le point de spawn devrait idéalement être la main du boss (un Transform public handTransform)
+        // Pour l'instant on garde transform.position + offset hauteur
+        Vector3 spawnPos = transform.position + Vector3.up * 1.5f;
 
-        GameObject fireball = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
-        Vector3 direction = (playerHead.position - transform.position).normalized;
-        
+        GameObject fireball = Instantiate(fireballPrefab, spawnPos, Quaternion.identity);
+        Vector3 direction = (playerHead.position - spawnPos).normalized;
+
         Rigidbody rb = fireball.GetComponent<Rigidbody>();
         if (rb == null) rb = fireball.AddComponent<Rigidbody>();
-        
         rb.useGravity = false;
-        rb.linearVelocity = direction * fireballSpeed; // "rb.velocity" pour les anciennes versions d'Unity
-        
-        Destroy(fireball, 5f); // Nettoyage après 5s
+        rb.linearVelocity = direction * fireballSpeed;
+        Destroy(fireball, 5f);
     }
 
-    // 2. ZONE AU SOL
     void SpawnZoneAttack()
     {
         if (playerHead == null || zoneAttackPrefab == null) return;
-        
-        // On vise le sol sous le joueur
         Vector3 spawnPos = new Vector3(playerHead.position.x, 0, playerHead.position.z);
         Instantiate(zoneAttackPrefab, spawnPos, Quaternion.identity);
     }
 
-    // 3. LASER ROTATIF
     IEnumerator LaserSpinAttackRoutine()
     {
         if (laserEmitterObject == null) yield break;
 
-        // Décale le laser un peu pour qu'il ne commence pas pile à 0°
-        transform.Rotate(Vector3.up, Random.Range(0f, 360f));
+        // 1. Début de l'anim (ex: Tendre les bras, ouvrir le torse)
+        if (bossAnimator) bossAnimator.SetBool("IsLasering", true);
 
-        // A. On active le laser
+        // Petite pause pour laisser l'anim se mettre en place
+        yield return new WaitForSeconds(0.5f);
+
+        transform.Rotate(Vector3.up, Random.Range(0f, 360f));
         laserEmitterObject.SetActive(true);
 
         float timer = 0f;
-        float rotationSpeed = 360f / laserRotationDuration; // Vitesse pour faire 360° pile dans le temps imparti
+        float rotationSpeed = 360f / laserRotationDuration;
 
-        // B. On tourne pendant la durée définie
         while (timer < laserRotationDuration)
         {
             transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
             timer += Time.deltaTime;
-            yield return null; // Attendre la frame suivante
+            yield return null;
         }
 
-        // C. On désactive le laser
         laserEmitterObject.SetActive(false);
+
+        // 2. Fin de l'anim
+        if (bossAnimator) bossAnimator.SetBool("IsLasering", false);
+        yield return new WaitForSeconds(0.5f); // Zéroter la rotation de fin
     }
 
     IEnumerator DashAttackRoutine()
     {
-       Vector3 targetDirection = (playerHead.position - transform.position).normalized;
+        // --- PHASE 1 : PRÉPARATION ---
+        if (bossAnimator) bossAnimator.SetTrigger("PrepareDash");
+        Debug.Log("Boss : Charge en préparation...");
+
+        Vector3 targetDirection = (playerHead.position - transform.position).normalized;
         float distanceToTravel = Vector3.Distance(transform.position, playerHead.position) + dashOvershoot;
         Vector3 finalTargetPos = transform.position + (targetDirection * distanceToTravel);
-        finalTargetPos.y = transform.position.y; // On reste au sol
+        finalTargetPos.y = transform.position.y;
 
-        // 2. SÉCURITÉ MRUK : Est-ce qu'on va taper un mur ?
-        // On lance un rayon depuis le boss vers la destination
+        // Détection de murs MRUK (Ton code existant)
         if (currentRoom != null)
         {
             Ray ray = new Ray(transform.position, targetDirection);
-            
-            // On demande à la pièce (Room) si ce rayon touche un MUR, une FENÊTRE ou une PORTE
-            // (LabelFilter permet de choisir ce qu'on veut éviter)
             LabelFilter filter = new LabelFilter(
-                MRUKAnchor.SceneLabels.WALL_FACE | 
-                MRUKAnchor.SceneLabels.WINDOW_FRAME | 
+                MRUKAnchor.SceneLabels.WALL_FACE |
+                MRUKAnchor.SceneLabels.WINDOW_FRAME |
                 MRUKAnchor.SceneLabels.DOOR_FRAME
             );
-
             RaycastHit hit;
-            // On utilise le Raycast natif de MRUK s'il est dispo, sinon le Physics standard fonctionne 
-            // car MRUK met des colliders sur les murs.
             if (Physics.Raycast(ray, out hit, distanceToTravel))
             {
-                // Vérifions si l'objet touché est bien une partie de la pièce (Anchor)
                 MRUKAnchor anchor = hit.collider.GetComponentInParent<MRUKAnchor>();
-                
-                // Si on touche un mur (et pas le joueur !), on raccourcit la charge
                 if (anchor != null && filter.PassesFilter(anchor.Label))
                 {
-                    Debug.Log("Mur détecté ! Ajustement de la charge.");
-                    // On s'arrête 50cm avant le mur pour ne pas clipper dedans
-                    finalTargetPos = hit.point - (targetDirection * 0.5f);
+                    finalTargetPos = hit.point - (targetDirection * 0.8f); // Marge augmentée
                     finalTargetPos.y = transform.position.y;
                 }
             }
         }
 
-        // On attend un peu (le boss pourrait trembler ou changer de couleur ici)
-       Debug.Log("Boss : Charge en préparation...");
         yield return new WaitForSeconds(dashPreparationTime);
+
+        // --- PHASE 2 : ACTION ---
+        if (bossAnimator) bossAnimator.SetBool("IsDashing", true); // Anim de course/vol
 
         Collider bossCollider = GetComponent<Collider>();
         if (bossCollider != null) bossCollider.isTrigger = true;
 
-        // On bouge vers la position (potentiellement corrigée par le mur)
         while (Vector3.Distance(transform.position, finalTargetPos) > 0.5f)
         {
             transform.position = Vector3.MoveTowards(transform.position, finalTargetPos, dashSpeed * Time.deltaTime);
@@ -243,8 +240,10 @@ public class BossController : MonoBehaviour
         }
 
         if (bossCollider != null) bossCollider.isTrigger = false;
-        
-        yield return new WaitForSeconds(0.5f);
+
+        // --- PHASE 3 : FIN ---
+        if (bossAnimator) bossAnimator.SetBool("IsDashing", false); // Retour Idle
+        yield return new WaitForSeconds(0.5f); // Récupération
     }
 
     public void ChangeState(BossState newState)

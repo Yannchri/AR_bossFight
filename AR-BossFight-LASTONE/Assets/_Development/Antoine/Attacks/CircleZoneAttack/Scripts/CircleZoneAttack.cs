@@ -9,9 +9,7 @@ public class CircleZoneAttack : MonoBehaviour
     public float rayonDeDegats = 1.0f;       // Doit correspondre à la taille visuelle
     public int degats = 20;
 
-    [Header("Visuels")]
-    public GameObject warningVisual;   // Glisse le WarningCircle ici
-    public GameObject explosionVisual; // Glisse le ExplosionEffect ici
+  
 
     void Start()
     {
@@ -21,16 +19,13 @@ public class CircleZoneAttack : MonoBehaviour
 
     IEnumerator SequenceAttaque()
     {
-        // PHASE 1 : Prévention
-        warningVisual.SetActive(true);
-        explosionVisual.SetActive(false);
+       
 
         // On attend que le joueur bouge (ou pas)
         yield return new WaitForSeconds(tempsAvantExplosion);
 
         // PHASE 2 : Boum !
-        warningVisual.SetActive(false);
-        explosionVisual.SetActive(true);
+  
 
         ApplyDamage(); // On vérifie qui est touché
 
