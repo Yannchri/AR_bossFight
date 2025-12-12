@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4815914358550952102}
   - component: {fileID: 5064520053859584567}
   - component: {fileID: 1298674775424197668}
+  - component: {fileID: 583971595457975034}
   m_Layer: 0
   m_Name: TirDuBoss
   m_TagString: Untagged
@@ -130,3 +131,30 @@ MonoBehaviour:
   degats: 20
   warningVisual: {fileID: 0}
   explosionVisual: {fileID: 0}
+--- !u!54 &583971595457975034
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8263062722629253008}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

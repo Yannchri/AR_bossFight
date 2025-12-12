@@ -29,6 +29,7 @@ TagManager:
   - SamplesInfoPanel
   - QDSUIToggleCheckboxRadio
   - Shield
+  - Boss
   layers:
   - Default
   - TransparentFX
