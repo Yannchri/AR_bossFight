@@ -130,8 +130,6 @@ MonoBehaviour:
   dureeExplosion: 0.5
   rayonDeDegats: 1
   degats: 20
-  warningVisual: {fileID: 0}
-  explosionVisual: {fileID: 0}
 --- !u!54 &583971595457975034
 Rigidbody:
   m_ObjectHideFlags: 0

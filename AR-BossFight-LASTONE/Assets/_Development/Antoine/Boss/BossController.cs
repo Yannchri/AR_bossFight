@@ -146,8 +146,10 @@ public class BossController : MonoBehaviour
         // Pour l'instant on garde transform.position + offset hauteur
         Vector3 spawnPos = transform.position + Vector3.up * 1.5f;
 
-        GameObject fireball = Instantiate(fireballPrefab, spawnPos, Quaternion.identity);
         Vector3 direction = (playerHead.position - spawnPos).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+        GameObject fireball = Instantiate(fireballPrefab, spawnPos, lookRotation);
 
         Rigidbody rb = fireball.GetComponent<Rigidbody>();
         if (rb == null) rb = fireball.AddComponent<Rigidbody>();
