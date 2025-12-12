@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8283832167987661174}
   - component: {fileID: 604094793553276340}
   - component: {fileID: 8046169237994476120}
+  - component: {fileID: 1926914889619577055}
   m_Layer: 0
   m_Name: LightningProjectile
   m_TagString: Untagged
@@ -139,7 +140,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &8046169237994476120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,4 +153,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2d25fd79bf62d947a06f3a335542cb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelfDestruct
+  lifeTime: 5
+--- !u!114 &1926914889619577055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4103579796698191563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0eea945015c6bac4fae5fa79a0471942, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpellProjectile
+  impactEffectPrefab: {fileID: 8336787906217569502, guid: 79ed742ac5c1bdc439744471390e5088, type: 3}
   lifeTime: 5

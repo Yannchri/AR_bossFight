@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 
 public class HandHUDActivator : MonoBehaviour
 {
@@ -6,50 +7,49 @@ public class HandHUDActivator : MonoBehaviour
     [Range(0f, 1f)]
     public float threshold = 0.6f;
 
-    [Header("Position")]
-    public float palmOffset = 0.09f;
+    [Header("Offset (local wrist space)")]
+    public Vector3 offset = new Vector3(0f, 0.05f, 0.02f);
 
     [Header("References")]
     public Canvas canvas;
+    public OVRSkeleton leftHandSkeleton;
 
-    private Transform hand;
-    private Camera cam;
+    Transform wrist;
+    Camera cam;
 
     void Start()
     {
-        hand = transform.parent;
-        cam = FindObjectOfType<Camera>();
-
-        if (canvas != null)
-            canvas.enabled = false;
+        cam = Camera.main;
+        if (canvas) canvas.enabled = false;
+        StartCoroutine(InitWrist());
     }
 
-    void Update()
+    System.Collections.IEnumerator InitWrist()
     {
-        if (!hand || !canvas) return;
+        while (!leftHandSkeleton || !leftHandSkeleton.IsInitialized)
+            yield return null;
 
-        // Normale de la paume (Meta Quest)
-        Vector3 palmNormal = -hand.up;
-
-        float dot = Vector3.Dot(palmNormal, Vector3.up);
-        bool show = dot > threshold;
-
-        canvas.enabled = show;
-
-        if (!show) return;
-
-        // POSITION : devant la paume
-        transform.position = hand.position + palmNormal * palmOffset;
+        wrist = leftHandSkeleton.Bones
+            .First(b => b.Id == OVRSkeleton.BoneId.Hand_WristRoot)
+            .Transform;
     }
 
     void LateUpdate()
     {
-        if (!canvas.enabled || cam == null) return;
+        if (!wrist || !canvas) return;
 
-        // Toujours face au casque (ignore rotation main)
+        // Paume vers le haut = activation
+        Vector3 palmUp = -wrist.up;
+        float dot = Vector3.Dot(palmUp, Vector3.up);
+        bool show = dot > threshold;
+
+        canvas.enabled = show;
+        if (!show) return;
+
+        transform.position = wrist.position + wrist.rotation * offset;
+
         transform.rotation = Quaternion.LookRotation(
-            transform.position - cam.transform.position,
-            Vector3.up
+            transform.position - cam.transform.position
         );
     }
 }

@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 410988740}
   - component: {fileID: 410988739}
   - component: {fileID: 410988746}
+  - component: {fileID: 410988747}
   m_Layer: 0
   m_Name: '[BuildingBlock] Hand Tracking left'
   m_TagString: Untagged
@@ -331,6 +332,21 @@ MonoBehaviour:
   shieldPrefab: {fileID: 6512680436455493012, guid: 80acecd740a7379418dac7b8c0c8049f, type: 3}
   positionOffset: {x: -0.02, y: 0.03, z: -0.05}
   rotationOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &410988747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410988737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecaad0c347af6364aba569b038c0eef8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HandHUDSpawner
+  healthBarPrefab: {fileID: 5043205382706019421, guid: 7544a4ee93dfc294991f966b11b1fde5, type: 3}
+  positionOffset: {x: -0.04, y: 0.06, z: -0.2}
+  rotationOffset: {x: -45, y: 90, z: 0}
 --- !u!1001 &545757190
 PrefabInstance:
   m_ObjectHideFlags: 0
