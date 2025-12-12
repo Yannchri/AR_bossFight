@@ -902,10 +902,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossController
   currentState: 0
   playerHead: {fileID: 0}
-  zoneAttackPrefab: {fileID: 7174422568383396302, guid: 0697f06a477f4ba40bedeed5224864c9, type: 3}
   attackCooldown: 3
+  zoneAttackPrefab: {fileID: 7174422568383396302, guid: 0697f06a477f4ba40bedeed5224864c9, type: 3}
   fireballPrefab: {fileID: 8263062722629253008, guid: 4ead8f8cbbdb85546a2f0a34fe17acec, type: 3}
   fireballSpeed: 8
+  laserEmitterObject: {fileID: 0}
+  laserRotationDuration: 4
 --- !u!120 &193548291531444915
 LineRenderer:
   serializedVersion: 2

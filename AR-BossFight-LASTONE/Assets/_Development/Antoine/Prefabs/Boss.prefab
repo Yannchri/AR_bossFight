@@ -310,3 +310,6 @@ MonoBehaviour:
   fireballSpeed: 4
   laserEmitterObject: {fileID: 7234017322586567639}
   laserRotationDuration: 4
+  dashSpeed: 20
+  dashOvershoot: 5
+  dashPreparationTime: 1

@@ -1,14 +1,9 @@
 fileFormatVersion: 2
-guid: d76f4d3de780c434f8397ae8112277bd
+guid: 043f5d6e999ae5f429dd160347780604
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: Baked_BaseColor
-    second: {fileID: 2800000, guid: d049e48d2115bef4da86a226c0636bff, type: 3}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

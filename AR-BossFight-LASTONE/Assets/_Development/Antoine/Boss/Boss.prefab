@@ -126,5 +126,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossController
   currentState: 0
   playerHead: {fileID: 0}
-  zoneAttackPrefab: {fileID: 0}
   attackCooldown: 3
+  zoneAttackPrefab: {fileID: 0}
+  fireballPrefab: {fileID: 0}
+  fireballSpeed: 8
+  laserEmitterObject: {fileID: 0}
+  laserRotationDuration: 4
+  dashSpeed: 20
+  dashOvershoot: 5
+  dashPreparationTime: 1

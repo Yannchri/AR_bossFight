@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 87220631}
   m_Layer: 0
   m_Name: CenterEyeAnchor
-  m_TagString: MainCamera
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -798,7 +798,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectionSurfaceType: 0
-  overlayType: 1
+  overlayType: 2
   compositionDepth: 0
   hidden: 0
   overridePerLayerColorScaleAndOffset: 0
@@ -915,11 +915,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1768565211}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1208197047 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1010235576183485152, guid: cc23f26500fe15949b6782330a97ca95, type: 3}
-  m_PrefabInstance: {fileID: 4781676747136721057}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1226408529
 GameObject:
   m_ObjectHideFlags: 0
@@ -1376,7 +1371,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3570011799251551763, guid: cc23f26500fe15949b6782330a97ca95, type: 3}
   m_PrefabInstance: {fileID: 4781676747136721057}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1208197047}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de27d7f2f20024e18898941292d6c164, type: 3}
@@ -1561,7 +1556,7 @@ PrefabInstance:
     - target: {fileID: 7877374543706198464, guid: 43162bf14a4567a49a2b077c61dde538, type: 3}
       propertyPath: loadingScreen
       value: 
-      objectReference: {fileID: 1208197047}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
