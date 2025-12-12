@@ -1,22 +1,40 @@
 using UnityEngine;
-using TMPro; // Ou UnityEngine.UI si tu utilises l'ancien texte
 using System.Collections;
+using TMPro; // Si tu utilises TextMeshPro
 
 public class DamageUI : MonoBehaviour
 {
-    public GameObject hitMessage; // Glisse le texte ici
-    public GameObject blockMessage;
+    [Header("Messages UI")]
+    public GameObject hitMessage;   // Le texte "AIE !"
+    public GameObject blockMessage; // Le texte "BLOQUÉ !"
+
+    // Singleton pour accès facile depuis partout
+    public static DamageUI instance;
+
+    void Awake()
+    {
+        instance = this;
+    }
 
     public void ShowHitEffect()
     {
-        StopAllCoroutines(); // Reset si on est touché plein de fois
-        StartCoroutine(FlashMessage());
+        StopAllCoroutines();
+        StartCoroutine(FlashMessage(hitMessage));
     }
 
-    IEnumerator FlashMessage()
+    public void ShowBlockEffect()
     {
-        hitMessage.SetActive(true);
-        yield return new WaitForSeconds(1.0f); // Reste affiché 1 seconde
-        hitMessage.SetActive(false);
+        StopAllCoroutines();
+        StartCoroutine(FlashMessage(blockMessage));
+    }
+
+    IEnumerator FlashMessage(GameObject messageObj)
+    {
+        if (messageObj != null)
+        {
+            messageObj.SetActive(true);
+            yield return new WaitForSeconds(1.0f); // Affiche 1 seconde
+            messageObj.SetActive(false);
+        }
     }
 }
