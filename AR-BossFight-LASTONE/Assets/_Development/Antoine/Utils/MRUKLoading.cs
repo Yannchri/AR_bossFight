@@ -67,6 +67,13 @@ public class MRUKLoading : MonoBehaviour
 
             newBossInstance.SetActive(true);
 
+            // On récupère le script du boss et on lui donne la référence de la Room
+            BossController bossScript = newBossInstance.GetComponent<BossController>();
+            if (bossScript != null)
+            {
+                bossScript.currentRoom = currentRoom;
+            }
+
             // 2. CALCUL DE HAUTEUR (Ta logique automatique)
             float adjustment = verticalOffset;
             
