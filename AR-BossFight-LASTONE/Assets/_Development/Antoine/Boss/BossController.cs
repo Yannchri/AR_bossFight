@@ -203,10 +203,12 @@ public class BossController : MonoBehaviour
 
         Vector3 targetDirection = (playerHead.position - transform.position).normalized;
         float distanceToTravel = Vector3.Distance(transform.position, playerHead.position) + dashOvershoot;
-        Vector3 finalTargetPos = transform.position + (targetDirection * distanceToTravel);
-        finalTargetPos.y = transform.position.y;
 
-        // Détection de murs MRUK (Ton code existant)
+        // Calcul de la position cible
+        Vector3 finalTargetPos = transform.position + (targetDirection * distanceToTravel);
+        finalTargetPos.y = transform.position.y; // On reste au sol
+
+        // --- DETECTION MURS (Ton code MRUK) ---
         if (currentRoom != null)
         {
             Ray ray = new Ray(transform.position, targetDirection);
@@ -221,31 +223,41 @@ public class BossController : MonoBehaviour
                 MRUKAnchor anchor = hit.collider.GetComponentInParent<MRUKAnchor>();
                 if (anchor != null && filter.PassesFilter(anchor.Label))
                 {
-                    finalTargetPos = hit.point - (targetDirection * 0.8f); // Marge augmentée
+                    finalTargetPos = hit.point - (targetDirection * 0.8f);
                     finalTargetPos.y = transform.position.y;
                 }
             }
         }
 
+        // Attente de la préparation (Assure-toi que ce temps n'est pas plus long que l'animation !)
         yield return new WaitForSeconds(dashPreparationTime);
 
-        // --- PHASE 2 : ACTION ---
-        if (bossAnimator) bossAnimator.SetBool("IsDashing", true); // Anim de course/vol
+        // --- PHASE 2 : ACTION (COURSE) ---
+        // ATTENTION A LA CASSE ICI : Vérifie si c'est "IsDashing" ou "isDashing" dans ton Animator
+        if (bossAnimator) bossAnimator.SetBool("IsDashing", true);
 
+        // Force la physique du boss en Trigger pour traverser le joueur sans collision physique
         Collider bossCollider = GetComponent<Collider>();
         if (bossCollider != null) bossCollider.isTrigger = true;
 
-        while (Vector3.Distance(transform.position, finalTargetPos) > 0.5f)
+        // SÉCURITÉ : On ajoute un timer pour éviter que le while ne tourne à l'infini
+        float safetyTimer = 0f;
+        float maxDashDuration = 3.0f; // Sécurité de 3 secondes max
+
+        // Boucle de mouvement
+        while (Vector3.Distance(transform.position, finalTargetPos) > 1.0f && safetyTimer < maxDashDuration)
         {
             transform.position = Vector3.MoveTowards(transform.position, finalTargetPos, dashSpeed * Time.deltaTime);
+            safetyTimer += Time.deltaTime;
             yield return null;
         }
 
+        // --- PHASE 3 : FIN ---
+        if (bossAnimator) bossAnimator.SetBool("IsDashing", false); // On coupe l'anim
+
         if (bossCollider != null) bossCollider.isTrigger = false;
 
-        // --- PHASE 3 : FIN ---
-        if (bossAnimator) bossAnimator.SetBool("IsDashing", false); // Retour Idle
-        yield return new WaitForSeconds(0.5f); // Récupération
+        yield return new WaitForSeconds(0.5f); // Temps de récupération
     }
 
     public void ChangeState(BossState newState)
