@@ -3,20 +3,33 @@ using UnityEngine;
 public class Fireball : MonoBehaviour
 {
     public int damage = 10;
+    
+    // Optionnel : Ajouter un effet visuel quand ça touche le bouclier
+    // public GameObject hitSparksPrefab; 
 
-    // Se déclenche quand la boule touche quelque chose
     void OnTriggerEnter(Collider other)
     {
-        // On vérifie si c'est le joueur (assure-toi que ton joueur a le Tag "Player")
-        if (other.CompareTag("Player"))
+        // --- 1. INTERACTION AVEC LE BOUCLIER ---
+        if (other.CompareTag("Shield"))
         {
-            Debug.Log("BOUM ! Le joueur est touché !");
+            Debug.Log("<color=cyan>BLOCKED!</color> Le tir a rebondi sur le bouclier.");
             
-            // Ici, tu appelleras plus tard le script de vie du joueur
-            // ex: other.GetComponent<PlayerHealth>().TakeDamage(damage);
+            // Ici, tu pourras instancier des étincelles plus tard
+            // if (hitSparksPrefab != null) Instantiate(hitSparksPrefab, transform.position, Quaternion.identity);
+
+            Destroy(this.gameObject); // On détruit la boule de feu
+            return; // IMPORTANT : On arrête la fonction ici pour ne pas blesser le joueur juste après
         }
 
-        // On détruit la boule de feu au contact (sauf si c'est le boss lui-même pour éviter qu'il se tire dessus)
+        // --- 2. INTERACTION AVEC LE JOUEUR ---
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("<color=red>HIT!</color> Le joueur prend des dégâts.");
+            // other.GetComponent<PlayerHealth>().TakeDamage(damage);
+        }
+
+        // --- 3. NETTOYAGE ---
+        // On détruit la boule si elle touche n'importe quoi (Mur, Sol, Joueur) sauf le Boss lui-même
         if (!other.CompareTag("Boss")) 
         {
             Destroy(this.gameObject);

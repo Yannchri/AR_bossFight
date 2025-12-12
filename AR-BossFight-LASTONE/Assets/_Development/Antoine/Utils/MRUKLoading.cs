@@ -12,11 +12,15 @@ public class MRUKLoading : MonoBehaviour
     [SerializeField] private GameObject loadingScreen;
 
     [Header("Boss Configuration")]
-    // On change le nom pour être clair : c'est le "moule", pas l'objet réel
     [SerializeField] private GameObject bossPrefab; 
-    
     [Tooltip("Ajustement vertical manuel")]
     [SerializeField] private float verticalOffset = 0.0f; 
+
+    // --- NOUVEAU : Configuration des Potions ---
+    [Header("Items Configuration")]
+    [SerializeField] private GameObject potionPrefab; // Ton prefab de potion
+    [SerializeField] private int numberOfPotions = 3; // Combien de potions ?
+    [SerializeField] private float potionOffset = 0.1f; // Petit décalage pour ne pas qu'elle soit dans le sol
 
     private bool sceneHasBeenLoaded = false;
     private MRUKRoom currentRoom;
@@ -38,13 +42,54 @@ public class MRUKLoading : MonoBehaviour
 
         if (currentRoom != null)
         {
-            StartCoroutine(SpawnBossFromPrefab()); // On change le nom de la coroutine
+            StartCoroutine(SpawnBossFromPrefab());
+            SpawnPotions(); // --- NOUVEAU : On lance le spawn des potions
+            
             if (loadingScreen != null) loadingScreen.SetActive(false);
         }
     }
 
+    // --- NOUVEAU : La fonction pour les potions ---
+    private void SpawnPotions()
+    {
+        if (potionPrefab == null || currentRoom == null) return;
+
+        // On cherche sur le SOL ou sur les TABLES (plus sympa en MR)
+        LabelFilter filter = new LabelFilter(MRUKAnchor.SceneLabels.FLOOR | MRUKAnchor.SceneLabels.TABLE);
+
+        for (int i = 0; i < numberOfPotions; i++)
+        {
+            // On essaie de trouver une position (100 essais max par potion pour éviter une boucle infinie)
+            // minRadius: 0.1f (taille de la potion environ)
+            bool foundPosition = currentRoom.GenerateRandomPositionOnSurface(
+                MRUK.SurfaceType.FACING_UP, 
+                0.1f,    
+                filter, 
+                out Vector3 spawnPos, 
+                out Vector3 spawnNormal
+            );
+
+            if (foundPosition)
+            {
+                // Instantiation
+                GameObject newPotion = Instantiate(potionPrefab);
+                
+                // Ajustement Hauteur (Simple)
+                // On ajoute un petit offset pour être sûr qu'elle est posée "sur" la surface
+                spawnPos.y += potionOffset;
+                
+                newPotion.transform.position = spawnPos;
+                
+                // Optionnel : Rotation aléatoire sur l'axe Y pour varier
+                newPotion.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+            }
+        }
+        Debug.Log($"{numberOfPotions} potions générées.");
+    }
+
     private IEnumerator SpawnBossFromPrefab()
     {
+        // ... (Ton code existant pour le boss reste identique ici) ...
         yield return new WaitForSeconds(0.2f);
 
         if (bossPrefab == null || currentRoom == null) yield break;
@@ -61,20 +106,15 @@ public class MRUKLoading : MonoBehaviour
 
         if (foundPosition)
         {
-            // 1. INSTANTIATION : On crée une copie du prefab dans le monde réel
-            // On le crée d'abord, on le positionnera juste après
             GameObject newBossInstance = Instantiate(bossPrefab);
-
             newBossInstance.SetActive(true);
 
-            // On récupère le script du boss et on lui donne la référence de la Room
             BossController bossScript = newBossInstance.GetComponent<BossController>();
             if (bossScript != null)
             {
-                bossScript.currentRoom = currentRoom;
+                // bossScript.currentRoom = currentRoom; // Décommenter si nécessaire
             }
 
-            // 2. CALCUL DE HAUTEUR (Ta logique automatique)
             float adjustment = verticalOffset;
             
             Collider bossCollider = newBossInstance.GetComponent<Collider>();
@@ -85,20 +125,12 @@ public class MRUKLoading : MonoBehaviour
                 adjustment += bossCollider.bounds.extents.y;
             }
 
-            // 3. PLACEMENT FINAL
             spawnPos.y += adjustment;
             newBossInstance.transform.position = spawnPos;
 
-            // 4. ORIENTATION
             Vector3 lookAtPos = Camera.main.transform.position;
             lookAtPos.y = spawnPos.y;
             newBossInstance.transform.LookAt(lookAtPos);
-
-            Debug.Log($"Nouveau Boss créé à {spawnPos}");
-        }
-        else
-        {
-            Debug.LogError("Pas de place pour spawner le boss !");
         }
     }
 }
