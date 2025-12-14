@@ -5,13 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 50263f0c69e8e5f45ac8b8c4dbdc5370
+  - enabled: 1
     path: Assets/Scenes/Main_Quest_Build.unity
     guid: 741571fe2d3a25e478e8d2fac46d5c79
   - enabled: 0
     path: Assets/Scenes/Johann_PlayerSpellsLab.unity
     guid: 0eb8578324ccf2f47a538fe2cbe7030e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Totti_Gym.unity
     guid: fbd2063b2531b7447ac2f276ed26dd91
   m_configObjects:
