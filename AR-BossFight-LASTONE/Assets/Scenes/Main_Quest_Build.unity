@@ -119,6 +119,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &3964438
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3964439}
+  m_Layer: 0
+  m_Name: SpellSpawnAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3964439
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3964438}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 326339080}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &306619900
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -192,6 +223,86 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1010235576183485152, guid: 74b4bef5ce3bd4e449de09b29236988c, type: 3}
   m_PrefabInstance: {fileID: 306619900}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &326339077
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 326339080}
+  - component: {fileID: 326339082}
+  - component: {fileID: 326339081}
+  m_Layer: 0
+  m_Name: PlayerMagic
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &326339080
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326339077}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3964439}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &326339081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326339077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4aded9d1f27f1e4aad0c0296a9cd2ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSpellCaster
+  rightHandAnchor: {fileID: 1072182297}
+  handPoseReader: {fileID: 326339082}
+  fireballPrefab: {fileID: 4103579796698191563, guid: 6b743aff7a7c1bd49b31f18ce8bf99e3, type: 3}
+  iceSpikePrefab: {fileID: 4103579796698191563, guid: 447f1424336b365458683788256ad173, type: 3}
+  lightningRayPrefab: {fileID: 6039144684208652257, guid: 59dc888d6b7deb14a893c615d61ce9da, type: 3}
+  arcaneOrbPrefab: {fileID: 4103579796698191563, guid: 20c4d96ed385c6e439d6fd05cc6f5ec6, type: 3}
+  projectileSpeed: 10
+  castCooldown: 0.3
+  headTransform: {fileID: 815126607}
+  minArmDistance: 0.35
+  minForwardDot: 0.5
+  palmOffset: {x: 0, y: 0, z: 0.08}
+  lightningRange: 20
+  lightningDamage: 40
+  lightningHitLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  lightningBeamPrefab: {fileID: 6039144684208652257, guid: 59dc888d6b7deb14a893c615d61ce9da, type: 3}
+  lightningBeamDuration: 0.5
+  poseMinDuration: 0.1
+--- !u!114 &326339082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326339077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0feca58a8d2559b4bac23a0e9b3416bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HandPoseReader
+  useRightHand: 1
+  fingerExtendedDistance: 0.07
 --- !u!1 &410988737
 GameObject:
   m_ObjectHideFlags: 0
@@ -676,6 +787,11 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!4 &815126607 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400002, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+  m_PrefabInstance: {fileID: 1072182295}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &848973758
 GameObject:
   m_ObjectHideFlags: 0
@@ -1718,3 +1834,4 @@ SceneRoots:
   - {fileID: 1184173779}
   - {fileID: 306619900}
   - {fileID: 1241983958}
+  - {fileID: 326339080}

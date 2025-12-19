@@ -374,52 +374,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1 &979033583
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 979033585}
-  - component: {fileID: 979033584}
-  m_Layer: 0
-  m_Name: HandPoseReader
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &979033584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 979033583}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0feca58a8d2559b4bac23a0e9b3416bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HandPoseReader
-  useRightHand: 1
-  fingerExtendedDistance: 0.07
---- !u!4 &979033585
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 979033583}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.32814, y: 0, z: -1.13475}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1078412075
 GameObject:
   m_ObjectHideFlags: 0
@@ -604,7 +558,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84c08c3e698d3a047bd64831fba97020, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HandAnchorFollower
-  handPoseReader: {fileID: 979033584}
+  handPoseReader: {fileID: 0}
   useRotation: 0
   localOffset: {x: 0, y: 0, z: 0.05}
 --- !u!1 &1970563292
@@ -885,7 +839,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpellCaster
   rightHandAnchor: {fileID: 1569035052}
-  handPoseReader: {fileID: 979033584}
+  handPoseReader: {fileID: 0}
   fireballPrefab: {fileID: 4103579796698191563, guid: 6b743aff7a7c1bd49b31f18ce8bf99e3, type: 3}
   iceSpikePrefab: {fileID: 4103579796698191563, guid: 447f1424336b365458683788256ad173, type: 3}
   lightningRayPrefab: {fileID: 6039144684208652257, guid: 59dc888d6b7deb14a893c615d61ce9da, type: 3}
@@ -1050,7 +1004,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 741215012}
   - {fileID: 2043779110}
-  - {fileID: 979033585}
   - {fileID: 1554882251}
   - {fileID: 96006404}
   - {fileID: 2101154846}
