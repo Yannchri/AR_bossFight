@@ -1,6 +1,7 @@
+using System.Collections;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
 
 public class PlayerSpellCaster : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class PlayerSpellCaster : MonoBehaviour
     [Header("Spell Prefabs")]
     public GameObject fireballPrefab;
     public GameObject iceSpikePrefab;
-    public GameObject lightningRayPrefab;
+    public GameObject lightningRayPrefab; // utilisé comme impact FX pour Lightning
     public GameObject arcaneOrbPrefab;
 
     [Header("Casting Settings")]
@@ -27,7 +28,7 @@ public class PlayerSpellCaster : MonoBehaviour
     public float castCooldown = 0.3f;
 
     [Header("Arm Cast Condition")]
-    public Transform headTransform;           // à assigner à Main Camera
+    public Transform headTransform;           // à assigner à CenterEyeAnchor / Main Camera
     public float minArmDistance = 0.35f;      // ~35 cm devant la tête
     public float minForwardDot = 0.5f;        // main doit être +/- devant soi
 
@@ -45,6 +46,12 @@ public class PlayerSpellCaster : MonoBehaviour
     [Tooltip("Durée de vie du rayon (en secondes).")]
     public float lightningBeamDuration = 0.5f;
 
+    [Header("Collision")]
+    [Tooltip("Colliders du joueur à ignorer au spawn (ex: capsule 'PlayerBodyCollider').")]
+    public Collider[] playerCollidersToIgnore;
+
+    [Tooltip("Durée pendant laquelle le projectile ignore le joueur après le spawn (secondes).")]
+    public float ignorePlayerCollisionDuration = 0.25f;
 
     private float _lastCastTime = -999f;
 
@@ -53,11 +60,9 @@ public class PlayerSpellCaster : MonoBehaviour
     private HandPoseReader.HandPose _lastCastPose = HandPoseReader.HandPose.None;
     private float _poseStartTime = 0f;
 
-    // Temps minimum pendant lequel une pose doit rester identique
-    // avant de déclencher un sort (en secondes)
+    [Tooltip("Temps minimum pendant lequel une pose doit rester identique avant de déclencher un sort.")]
     public float poseMinDuration = 0.10f;
 
-    // ----------------- Unity loop -----------------
     void Update()
     {
         SpellType? spellToCast = DetectSpell();
@@ -69,6 +74,7 @@ public class PlayerSpellCaster : MonoBehaviour
         }
     }
 
+    // ----------------- Conditions de cast -----------------
     private bool IsArmExtended()
     {
         if (headTransform == null || handPoseReader == null)
@@ -78,37 +84,31 @@ public class PlayerSpellCaster : MonoBehaviour
             return false;
 
         Vector3 headPos = headTransform.position;
-
         Vector3 toHand = palmPos - headPos;
-        float distance = toHand.magnitude;
 
-        // composante "devant" par rapport à la tête
+        float distance = toHand.magnitude;
         float forwardDot = Vector3.Dot(toHand.normalized, headTransform.forward);
 
-        // Conditions :
-        // - suffisamment loin
-        // - grosso modo devant (pas derrière ou sur le côté)
         return distance > minArmDistance && forwardDot > minForwardDot;
     }
 
     private bool TryGetSpawnPose(out Vector3 spawnPos, out Quaternion spawnRot)
     {
-        // 1) On essaye d'utiliser la main trackée
+        // 1) main trackée
         if (handPoseReader != null && handPoseReader.TryGetPalmPose(out Vector3 palmPos, out Quaternion palmRot))
         {
-            // Position = paume + petit offset (dans l'orientation de la main)
             spawnPos = palmPos + palmRot * palmOffset;
 
-            // Rotation = on regarde dans la direction de la tête (devant soi)
+            // Rotation: on aligne le projectile sur le regard (si dispo)
             if (headTransform != null)
                 spawnRot = Quaternion.LookRotation(headTransform.forward, Vector3.up);
             else
-                spawnRot = palmRot; // fallback
+                spawnRot = palmRot;
 
             return true;
         }
 
-        // 2) Fallback : on utilise encore rightHandAnchor si besoin
+        // 2) fallback: anchor
         if (rightHandAnchor != null)
         {
             spawnPos = rightHandAnchor.position;
@@ -116,20 +116,18 @@ public class PlayerSpellCaster : MonoBehaviour
             return true;
         }
 
-        // 3) Rien trouvé
         spawnPos = Vector3.zero;
         spawnRot = Quaternion.identity;
         return false;
     }
 
-
     // ----------------- Détection du sort -----------------
     private SpellType? DetectSpell()
     {
 #if UNITY_EDITOR
-    var fromKeyboard = DetectSpellFromKeyboardDebug();
-    if (fromKeyboard.HasValue)
-        return fromKeyboard.Value;
+        var fromKeyboard = DetectSpellFromKeyboardDebug();
+        if (fromKeyboard.HasValue)
+            return fromKeyboard.Value;
 #endif
 
         if (handPoseReader == null)
@@ -145,15 +143,12 @@ public class PlayerSpellCaster : MonoBehaviour
             return null;
         }
 
-        // Pose neutre
         if (currentPose == HandPoseReader.HandPose.None)
             return null;
 
-        // Pas encore assez stable
         if (Time.time - _poseStartTime < poseMinDuration)
             return null;
 
-        // ✅ NOUVEAU : bras doit être tendu
         if (!IsArmExtended())
             return null;
 
@@ -178,35 +173,22 @@ public class PlayerSpellCaster : MonoBehaviour
         }
     }
 
-
-    // Debug uniquement : touches 1–4 = 4 poses de main
     private SpellType? DetectSpellFromKeyboardDebug()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-            return SpellType.Fireball;     // Pose 1 : main ouverte
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-            return SpellType.IceSpike;     // Pose 2 : poing
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-            return SpellType.LightningRay; // Pose 3 : index pointé
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-            return SpellType.ArcaneOrb;    // Pose 4 : majeur levé
-
+        if (Input.GetKeyDown(KeyCode.Alpha1)) return SpellType.Fireball;
+        if (Input.GetKeyDown(KeyCode.Alpha2)) return SpellType.IceSpike;
+        if (Input.GetKeyDown(KeyCode.Alpha3)) return SpellType.LightningRay;
+        if (Input.GetKeyDown(KeyCode.Alpha4)) return SpellType.ArcaneOrb;
         return null;
     }
 
-    // ----------------- Tir du sort -----------------
+    // ----------------- Cast -----------------
     private void CastSpell(SpellType spellType)
     {
-        // ⚡ Cas spécial : Lightning = raycast instantané
+        // ⚡ Cas spécial : Lightning = raycast + LineRenderer
         if (spellType == SpellType.LightningRay)
         {
             CastLightningRay();
-            return;
-        }
-
-        if (rightHandAnchor == null)
-        {
-            UnityEngine.Debug.LogWarning("RightHandAnchor is not assigned on PlayerSpellCaster.");
             return;
         }
 
@@ -217,43 +199,71 @@ public class PlayerSpellCaster : MonoBehaviour
             return;
         }
 
-        // Ici, tu peux garder ta logique actuelle de spawn (TryGetSpawnPose ou rightHandAnchor)
-        Vector3 spawnPos = rightHandAnchor.position;
-        Quaternion spawnRot = rightHandAnchor.rotation;
+        if (!TryGetSpawnPose(out Vector3 spawnPos, out Quaternion spawnRot))
+        {
+            UnityEngine.Debug.LogWarning("No valid spawn pose (palm/rightHandAnchor) for spell.");
+            return;
+        }
 
-        GameObject projectile = Instantiate(
-            prefab,
-            spawnPos,
-            spawnRot
-        );
+        GameObject projectile = Instantiate(prefab, spawnPos, spawnRot);
+
+        // Ignore collision joueur uniquement au spawn (évite explosion immédiate)
+        IgnorePlayerCollisionForProjectile(projectile);
 
         Rigidbody rb = projectile.GetComponent<Rigidbody>();
         if (rb != null)
         {
             float speed = GetSpeedForSpell(spellType);
-            rb.linearVelocity = rightHandAnchor.forward * speed;
+
+            // Direction = regard (priorité), sinon fallback sur la rotation du spawn
+            Vector3 dir = (headTransform != null) ? headTransform.forward : (spawnRot * Vector3.forward);
+
+            // IMPORTANT : utilise velocity (pas linearVelocity) pour Rigidbody Unity standard
+            rb.linearVelocity = dir.normalized * speed;
         }
     }
-
-
 
     private GameObject GetPrefabForSpell(SpellType spellType)
     {
         switch (spellType)
         {
-            case SpellType.Fireball:
-                return fireballPrefab;
-            case SpellType.IceSpike:
-                return iceSpikePrefab;
+            case SpellType.Fireball: return fireballPrefab;
+            case SpellType.IceSpike: return iceSpikePrefab;
+            case SpellType.ArcaneOrb: return arcaneOrbPrefab;
             case SpellType.LightningRay:
-                return null; // plus de projectile pour Lightning
-            case SpellType.ArcaneOrb:
-                return arcaneOrbPrefab;
             default:
                 return null;
         }
     }
 
+    // ----------------- Anti-collision au spawn -----------------
+    private void IgnorePlayerCollisionForProjectile(GameObject projectile)
+    {
+        if (projectile == null) return;
+
+        Collider projCol = projectile.GetComponent<Collider>();
+        if (projCol == null) return;
+
+        if (playerCollidersToIgnore == null || playerCollidersToIgnore.Length == 0) return;
+
+        foreach (var c in playerCollidersToIgnore)
+            if (c != null) Physics.IgnoreCollision(projCol, c, true);
+
+        StartCoroutine(ReEnablePlayerCollision(projCol, ignorePlayerCollisionDuration));
+    }
+
+    private IEnumerator ReEnablePlayerCollision(Collider projCol, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (projCol == null) yield break;
+        if (playerCollidersToIgnore == null) yield break;
+
+        foreach (var c in playerCollidersToIgnore)
+            if (c != null) Physics.IgnoreCollision(projCol, c, false);
+    }
+
+    // ----------------- Lightning -----------------
     private void CastLightningRay()
     {
         StartCoroutine(FireLightningBeam());
@@ -261,9 +271,11 @@ public class PlayerSpellCaster : MonoBehaviour
 
     private IEnumerator FireLightningBeam()
     {
+        if (lightningBeamPrefab == null)
+            yield break;
+
         float elapsed = 0f;
 
-        // Instancie le rayon une seule fois
         GameObject beam = Instantiate(lightningBeamPrefab);
         LineRenderer lr = beam.GetComponent<LineRenderer>();
 
@@ -271,21 +283,12 @@ public class PlayerSpellCaster : MonoBehaviour
         {
             elapsed += Time.deltaTime;
 
-            // 1) Position de départ du rayon
-            Vector3 origin;
-            Vector3 direction;
+            if (rightHandAnchor == null)
+                break;
 
-            if (rightHandAnchor != null)
-            {
-                origin = rightHandAnchor.position;
-                direction = rightHandAnchor.forward;
-            }
-            else
-            {
-                yield break; // sécurité
-            }
+            Vector3 origin = rightHandAnchor.position;
+            Vector3 direction = rightHandAnchor.forward;
 
-            // 2) Raycast pour voir si on touche quelque chose
             Ray ray = new Ray(origin, direction);
             Vector3 endPos = origin + direction * lightningRange;
 
@@ -293,14 +296,14 @@ public class PlayerSpellCaster : MonoBehaviour
             {
                 endPos = hit.point;
 
-                // On applique les dégâts seulement AU PREMIER contact
+                // D tells: dégâts uniquement au tout début du beam
                 if (elapsed < 0.02f)
                 {
                     Health h = hit.collider.GetComponentInParent<Health>();
                     if (h != null)
                         h.ApplyDamage(lightningDamage);
 
-                    // Impact FX
+                    // Impact FX (optionnel)
                     if (lightningRayPrefab != null)
                     {
                         Instantiate(
@@ -312,39 +315,29 @@ public class PlayerSpellCaster : MonoBehaviour
                 }
             }
 
-            // 3) Met à jour le LineRenderer en temps réel
             if (lr != null)
             {
                 lr.SetPosition(0, origin);
                 lr.SetPosition(1, endPos);
             }
 
-            yield return null; // attendre la prochaine frame
+            yield return null;
         }
 
         Destroy(beam);
     }
 
-
-
+    // ----------------- Vitesse -----------------
     private float GetSpeedForSpell(SpellType spellType)
     {
-        // Pour l'instant : une seule vitesse globale
-        // Si tu veux, on peut différencier un peu avec des multiplicateurs.
-
         switch (spellType)
         {
-            case SpellType.Fireball:
-                return projectileSpeed * 0.8f;   // un peu plus lente
-            case SpellType.IceSpike:
-                return projectileSpeed * 1.2f;   // un peu plus rapide
-            case SpellType.ArcaneOrb:
-                return projectileSpeed * 0.7f;   // lourde & lente
+            case SpellType.Fireball: return projectileSpeed * 0.8f;
+            case SpellType.IceSpike: return projectileSpeed * 1.2f;
+            case SpellType.ArcaneOrb: return projectileSpeed * 0.7f;
             case SpellType.LightningRay:
-                return projectileSpeed;          // pas vraiment utilisé (raycast)
             default:
                 return projectileSpeed;
         }
     }
-
 }

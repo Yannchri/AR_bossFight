@@ -280,7 +280,7 @@ MonoBehaviour:
   headTransform: {fileID: 815126607}
   minArmDistance: 0.35
   minForwardDot: 0.5
-  palmOffset: {x: 0, y: 0, z: 0.08}
+  palmOffset: {x: 0, y: 0, z: 0.2}
   lightningRange: 20
   lightningDamage: 40
   lightningHitLayers:
@@ -288,6 +288,9 @@ MonoBehaviour:
     m_Bits: 4294967295
   lightningBeamPrefab: {fileID: 6039144684208652257, guid: 59dc888d6b7deb14a893c615d61ce9da, type: 3}
   lightningBeamDuration: 0.5
+  playerCollidersToIgnore:
+  - {fileID: 1897283673}
+  ignorePlayerCollisionDuration: 0.25
   poseMinDuration: 0.1
 --- !u!114 &326339082
 MonoBehaviour:

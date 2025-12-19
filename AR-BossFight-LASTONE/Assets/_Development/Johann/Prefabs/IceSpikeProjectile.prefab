@@ -281,7 +281,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpellProjectile
   impactEffectPrefab: {fileID: 8336787906217569502, guid: 989d30fc354b2074986d2e97a16f680c, type: 3}
-  lifeTime: 5
+  lifeTime: 0.1
   directDamage: 50
   enableDot: 0
   dotTotalDamage: 0
