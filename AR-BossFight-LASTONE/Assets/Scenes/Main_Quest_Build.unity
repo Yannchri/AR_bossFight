@@ -799,6 +799,124 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
   m_PrefabInstance: {fileID: 1072182295}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &848122102
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 848122103}
+  - component: {fileID: 848122106}
+  - component: {fileID: 848122105}
+  - component: {fileID: 848122104}
+  m_Layer: 0
+  m_Name: '[BuildingBlock] HandGrabInstallationRoutine'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &848122103
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848122102}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.0003521164, y: 0.1235375, z: 0.00282845, w: 0.9923359}
+  m_LocalPosition: {x: -0.10350689, y: -0.0017158608, z: 0.81835717}
+  m_LocalScale: {x: 0.1, y: 0.10000002, z: 0.1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1398132078}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &848122104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848122102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a1bc992571301d4a9602ac95ef4c71a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interactorFilters: []
+  _maxInteractors: -1
+  _maxSelectingInteractors: -1
+  _data: {fileID: 0}
+  _pointableElement: {fileID: 1398132080}
+  _rigidbody: {fileID: 1398132077}
+  _grabSource: {fileID: 0}
+  _useClosestPointAsGrabSource: 0
+  _releaseDistance: 0
+  _resetGrabOnGrabsUpdated: 1
+  _physicsGrabbable: {fileID: 0}
+--- !u!114 &848122105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848122102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9a7676b01585ce43908639a27765dfc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interactorFilters: []
+  _maxInteractors: -1
+  _maxSelectingInteractors: -1
+  _data: {fileID: 0}
+  _pointableElement: {fileID: 1398132080}
+  _rigidbody: {fileID: 1398132077}
+  _physicsGrabbable: {fileID: 0}
+  _resetGrabOnGrabsUpdated: 1
+  _scoringModifier:
+    _positionRotationWeight: 0.5
+  _slippiness: 0
+  _supportedGrabTypes: 3
+  _pinchGrabRules:
+    _thumbRequirement: 0
+    _indexRequirement: 1
+    _middleRequirement: 1
+    _ringRequirement: 0
+    _pinkyRequirement: 0
+    _unselectMode: 1
+  _palmGrabRules:
+    _thumbRequirement: 1
+    _indexRequirement: 0
+    _middleRequirement: 2
+    _ringRequirement: 2
+    _pinkyRequirement: 1
+    _unselectMode: 0
+  _movementProvider: {fileID: 0}
+  _handAligment: 0
+  _handGrabPoses: []
+--- !u!114 &848122106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848122102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b023183069df224080314a560e6e1ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
+  blockId: f8766c17-aaf8-4b55-9431-de8deea83842
+  instanceId: 7e6821a8-2db9-4b18-907a-c643bfc792e7
+  version: 1
+  installationRoutineCheckpoint:
+    _installationRoutineId: f8338144-8280-4ff6-9455-ae2bb9c20fe8
+    _installationVariants:
+    - _memberName: mode
+      _value: '{"value__":0}'
 --- !u!1 &848973758
 GameObject:
   m_ObjectHideFlags: 0
@@ -1600,7 +1718,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1398132073}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02d61468f8b77ae4b92c344bc9a600fb, type: 3}
   m_Name: 
@@ -1764,6 +1882,10 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.15
       objectReference: {fileID: 0}
+    - target: {fileID: 37906183513083770, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5071871859504886445, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
       propertyPath: m_MovementType
       value: 1
@@ -1781,7 +1903,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1192632875}
     - target: {fileID: 5096464925823491884, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096464925823491884, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
       propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5096464925823491884, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
+      propertyPath: m_CollisionDetection
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5214456198945484709, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
@@ -1790,11 +1920,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5697082042459026432, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.299
+      value: 0.301
       objectReference: {fileID: 0}
     - target: {fileID: 5697082042459026432, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.072
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 5697082042459026432, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1835,6 +1965,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5697082042459026432, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
       insertIndex: 0
       addedObject: {fileID: 1866678948}
+    - targetCorrespondingSourceObject: {fileID: 5697082042459026432, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 848122103}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5214456198945484709, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
       insertIndex: -1
