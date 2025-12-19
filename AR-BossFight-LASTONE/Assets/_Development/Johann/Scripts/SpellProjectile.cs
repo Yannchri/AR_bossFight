@@ -3,9 +3,22 @@ using UnityEngine;
 
 public class SpellProjectile : MonoBehaviour
 {
+    [Header("Safety / Arming")]
+    [Tooltip("Temps pendant lequel le projectile ne peut PAS déclencher d'impact après son spawn.")]
+    public float armDelay = 0.15f;
+
+    [Tooltip("Distance minimale à parcourir avant de pouvoir impacter (sécurité complémentaire).")]
+    public float minTravelDistanceToArm = 0.10f;
+
+    [Tooltip("Si activé, le projectile ignore les collisions avec les layers masqués (utile pour Player/RoomScale).")]
+    public bool useCollisionLayerMask = true;
+
+    [Tooltip("Layers autorisés à déclencher un impact (tout le reste est ignoré).")]
+    public LayerMask impactLayers = ~0; // Everything par défaut
+
     [Header("Impact Settings")]
     public GameObject impactEffectPrefab;
-    public float lifeTime = 5f;   // sécurité : au cas où ça ne touche rien
+    public float lifeTime = 5f; // sécurité : au cas où ça ne touche rien
 
     [Header("Damage Settings")]
     public float directDamage = 0f;
@@ -43,13 +56,59 @@ public class SpellProjectile : MonoBehaviour
     [Tooltip("Facteur multiplicateur entre explosionRadius et la scale de l'impact visuel.")]
     public float impactScaleFactor = 1.0f;
 
+    [Header("AOE Filtering (recommended)")]
+    [Tooltip("Layers pris en compte par l'OverlapSphere (évite de toucher RoomScale / Player si tu ne veux pas).")]
+    public LayerMask aoeHitLayers = ~0;
 
-    void Start()
+    private bool _armed;
+    private Vector3 _spawnPos;
+
+    private void Awake()
+    {
+        _spawnPos = transform.position;
+        _armed = false;
+    }
+
+    private void Start()
     {
         Destroy(gameObject, lifeTime);
+        StartCoroutine(ArmAfterDelay());
     }
+
+    private IEnumerator ArmAfterDelay()
+    {
+        // Délai minimal
+        if (armDelay > 0f)
+            yield return new WaitForSeconds(armDelay);
+
+        _armed = true;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
+        // 1) Ne pas impacter tant qu'on n'est pas "armé"
+        if (!_armed)
+            return;
+
+        // 2) Ne pas impacter tant qu'on n'a pas parcouru une distance minimale
+        if (minTravelDistanceToArm > 0f)
+        {
+            float traveled = Vector3.Distance(_spawnPos, transform.position);
+            if (traveled < minTravelDistanceToArm)
+                return;
+        }
+
+        // 3) Filtre de layer (optionnel mais très utile)
+        if (useCollisionLayerMask)
+        {
+            int otherLayerMask = 1 << collision.gameObject.layer;
+            if ((impactLayers.value & otherLayerMask) == 0)
+            {
+                // Layer non autorisé => on ignore ce contact
+                return;
+            }
+        }
+
         Vector3 impactPos = transform.position;
         Vector3 impactNormal = Vector3.up;
 
@@ -83,16 +142,13 @@ public class SpellProjectile : MonoBehaviour
         {
             // Dégâts directs sur la cible principale
             if (directDamage > 0f)
-            {
                 mainTarget.ApplyDamage(directDamage);
-            }
 
             // DOT sur la cible principale
             if (enableDot && dotTotalDamage > 0f && dotDuration > 0f && dotTicks > 0)
             {
                 float tickDamage = dotTotalDamage / dotTicks;
                 float tickInterval = dotDuration / dotTicks;
-
                 mainTarget.StartCoroutine(ApplyDotOverTime(mainTarget, tickDamage, tickInterval, dotTicks));
             }
         }
@@ -100,7 +156,7 @@ public class SpellProjectile : MonoBehaviour
         // Explosion de zone (AOE)
         if (enableExplosion && explosionRadius > 0f)
         {
-            Collider[] hits = Physics.OverlapSphere(impactPos, explosionRadius);
+            Collider[] hits = Physics.OverlapSphere(impactPos, explosionRadius, aoeHitLayers, QueryTriggerInteraction.Ignore);
             foreach (var hit in hits)
             {
                 Health h = hit.GetComponentInParent<Health>();
@@ -114,9 +170,7 @@ public class SpellProjectile : MonoBehaviour
                 // Dégâts directs de zone
                 float aoeDirectDamage = directDamage * explosionDirectDamageFactor;
                 if (aoeDirectDamage > 0f)
-                {
                     h.ApplyDamage(aoeDirectDamage);
-                }
 
                 // DOT de zone
                 if (enableDot && dotTotalDamage > 0f && dotDuration > 0f && dotTicks > 0 && explosionDotDamageFactor > 0f)

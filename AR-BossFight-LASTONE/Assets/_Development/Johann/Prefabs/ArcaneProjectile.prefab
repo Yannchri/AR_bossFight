@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 604094793553276340}
   - component: {fileID: 5443683770359455673}
   - component: {fileID: 3465777208012818749}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ArcaneProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -166,6 +166,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0eea945015c6bac4fae5fa79a0471942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpellProjectile
+  armDelay: 0.15
+  minTravelDistanceToArm: 0.1
+  useCollisionLayerMask: 1
+  impactLayers:
+    serializedVersion: 2
+    m_Bits: 8
   impactEffectPrefab: {fileID: 8336787906217569502, guid: 2c832db9446be9a459620b68084b6a04, type: 3}
   lifeTime: 0.1
   directDamage: 999
@@ -178,4 +184,7 @@ MonoBehaviour:
   explosionDirectDamageFactor: 0.5
   explosionDotDamageFactor: 0.5
   scaleImpactWithExplosionRadius: 1
-  impactScaleFactor: 1
+  impactScaleFactor: 0.95
+  aoeHitLayers:
+    serializedVersion: 2
+    m_Bits: 8
