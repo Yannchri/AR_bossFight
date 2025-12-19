@@ -19,6 +19,13 @@ public class PotionPourDetector : MonoBehaviour
     private float initialLiquidHeight;
     private Renderer liquidRenderer;
     private Color liquidBaseColor;
+    private bool liquidHidden = false;
+
+    [Header("Droplet Settings")]
+    public float dropletLifetime = 3f;
+    public Vector2 dropletSizeRange = new Vector2(0.025f, 0.04f);
+    public Vector2 dropletForceRange = new Vector2(0.08f, 0.18f);
+    public float dropletSpinForce = 0.02f;
 
     [Header("References")]
     public GameObject dropletPrefab;
@@ -35,7 +42,6 @@ public class PotionPourDetector : MonoBehaviour
             liquidRenderer = liquidObject.GetComponent<Renderer>();
             if (liquidRenderer != null)
             {
-                // Force material instance + cache original color
                 liquidBaseColor = liquidRenderer.material.color;
             }
         }
@@ -45,10 +51,18 @@ public class PotionPourDetector : MonoBehaviour
 
     void Update()
     {
+        // Bottle empty → hide liquid and stop
         if (currentLiquid <= 0f)
         {
             currentLiquid = 0f;
-            return; // bottle empty
+
+            if (!liquidHidden && liquidObject != null)
+            {
+                liquidObject.gameObject.SetActive(false);
+                liquidHidden = true;
+            }
+
+            return;
         }
 
         float angle = Vector3.Angle(transform.up, Vector3.up);
@@ -79,18 +93,34 @@ public class PotionPourDetector : MonoBehaviour
         Rigidbody rb = droplet.GetComponent<Rigidbody>();
         if (rb != null)
         {
+            // Natural spread + downward bias
             Vector3 spread = new Vector3(
                 Random.Range(-0.08f, 0.08f),
-                Random.Range(-0.03f, 0.03f),
+                Random.Range(-0.05f, 0.02f),
                 Random.Range(-0.08f, 0.08f)
             );
 
-            Vector3 direction = (pourPoint.forward + spread).normalized;
-            rb.AddForce(direction * Random.Range(0.06f, 0.15f), ForceMode.Impulse);
+            Vector3 direction =
+                (pourPoint.forward + Vector3.down * 0.4f + spread).normalized;
+
+            rb.AddForce(
+                direction * Random.Range(dropletForceRange.x, dropletForceRange.y),
+                ForceMode.Impulse
+            );
+
+            // Add spin
+            rb.AddTorque(
+                Random.insideUnitSphere * dropletSpinForce,
+                ForceMode.Impulse
+            );
         }
 
-        float size = Random.Range(0.025f, 0.04f);
+        // Random droplet size
+        float size = Random.Range(dropletSizeRange.x, dropletSizeRange.y);
         droplet.transform.localScale = Vector3.one * size;
+
+        // Auto-destroy
+        Destroy(droplet, dropletLifetime);
     }
 
     void DrainLiquid()
@@ -109,7 +139,7 @@ public class PotionPourDetector : MonoBehaviour
 
     void UpdateLiquidVisual()
     {
-        if (liquidObject == null)
+        if (liquidObject == null || liquidHidden)
             return;
 
         float fillPercent = currentLiquid / maxLiquid;
@@ -124,12 +154,26 @@ public class PotionPourDetector : MonoBehaviour
         pos.y = -(initialLiquidHeight - scale.y) / 2f;
         liquidObject.localPosition = pos;
 
-        // 🔒 Keep liquid color stable (no grey fade)
+        // Keep color stable
         if (liquidRenderer != null)
         {
             Color c = liquidBaseColor;
-            c.a = liquidRenderer.material.color.a; // keep transparency
+            c.a = liquidRenderer.material.color.a;
             liquidRenderer.material.color = c;
         }
+    }
+
+    // Optional: refill support
+    public void Refill()
+    {
+        currentLiquid = maxLiquid;
+
+        if (liquidObject != null)
+        {
+            liquidObject.gameObject.SetActive(true);
+            liquidHidden = false;
+        }
+
+        UpdateLiquidVisual();
     }
 }
