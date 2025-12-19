@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Menu.unity
     guid: 50263f0c69e8e5f45ac8b8c4dbdc5370
   - enabled: 1
@@ -17,7 +17,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Totti_Gym.unity
     guid: fbd2063b2531b7447ac2f276ed26dd91
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Development/MaximusPrime/Scene1.unity
     guid: 2daaa7bf93d6f514e91de4f4494b3bf4
   m_configObjects:

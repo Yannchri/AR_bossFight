@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6201283848274725962}
   - component: {fileID: 58426261071423130}
   - component: {fileID: 6125856791868004029}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: IceSpikeModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,7 +128,7 @@ GameObject:
   - component: {fileID: 604094793553276340}
   - component: {fileID: 5462618292066713020}
   - component: {fileID: 7666880461431901436}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: IceSpikeProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -280,6 +280,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0eea945015c6bac4fae5fa79a0471942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpellProjectile
+  armDelay: 0.15
+  minTravelDistanceToArm: 0.1
+  useCollisionLayerMask: 1
+  impactLayers:
+    serializedVersion: 2
+    m_Bits: 8
   impactEffectPrefab: {fileID: 8336787906217569502, guid: 989d30fc354b2074986d2e97a16f680c, type: 3}
   lifeTime: 0.1
   directDamage: 50
@@ -293,3 +299,6 @@ MonoBehaviour:
   explosionDotDamageFactor: 0.5
   scaleImpactWithExplosionRadius: 1
   impactScaleFactor: 1
+  aoeHitLayers:
+    serializedVersion: 2
+    m_Bits: 8
