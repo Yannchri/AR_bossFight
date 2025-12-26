@@ -278,6 +278,8 @@ public class PlayerSpellCaster : MonoBehaviour
 
         GameObject beam = Instantiate(lightningBeamPrefab);
         LineRenderer lr = beam.GetComponent<LineRenderer>();
+        BeamVisualBinder binder = beam.GetComponent<BeamVisualBinder>();
+
 
         while (elapsed < lightningBeamDuration)
         {
@@ -291,6 +293,10 @@ public class PlayerSpellCaster : MonoBehaviour
 
             Ray ray = new Ray(origin, direction);
             Vector3 endPos = origin + direction * lightningRange;
+
+            if (binder != null)
+                binder.UpdateBeam(origin, endPos);
+
 
             if (Physics.Raycast(ray, out RaycastHit hit, lightningRange, lightningHitLayers, QueryTriggerInteraction.Ignore))
             {
