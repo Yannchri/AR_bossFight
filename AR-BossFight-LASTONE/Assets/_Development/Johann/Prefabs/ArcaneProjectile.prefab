@@ -167,13 +167,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpellProjectile
   armDelay: 0.15
-  minTravelDistanceToArm: 0.1
+  minTravelDistanceToArm: 5
   useCollisionLayerMask: 1
   impactLayers:
     serializedVersion: 2
     m_Bits: 8
   impactEffectPrefab: {fileID: 8336787906217569502, guid: 2c832db9446be9a459620b68084b6a04, type: 3}
-  lifeTime: 0.1
+  lifeTime: 5
   directDamage: 999
   enableDot: 0
   dotTotalDamage: 0
