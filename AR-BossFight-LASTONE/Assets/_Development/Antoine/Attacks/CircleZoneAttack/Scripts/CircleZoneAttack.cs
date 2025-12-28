@@ -38,16 +38,25 @@ public class CircleZoneAttack : MonoBehaviour
 
     void ApplyDamage()
     {
-        // On détecte tout ce qui est dans la sphère au moment T
-        Collider[] objetsTouches = Physics.OverlapSphere(transform.position, rayonDeDegats);
-
-        foreach (Collider col in objetsTouches)
+        if (PlayerHealth.Instance == null)
         {
-            if (col.CompareTag("Player"))
-            {
-                Debug.Log("<color=red>AIE ! Le joueur a pris " + degats + " dégâts !</color>");
-                // Plus tard : col.GetComponent<PlayerHealth>().TakeDamage(degats);
-            }
+            Debug.LogError("PlayerHealth.Instance NOT FOUND");
+            return;
+        }
+
+        Vector3 explosionPos = transform.position;
+        Vector3 playerPos = PlayerHealth.Instance.GetPlayerPosition();
+
+        // Ignore la hauteur (Y)
+        explosionPos.y = 0f;
+        playerPos.y = 0f;
+
+        float dist = Vector3.Distance(explosionPos, playerPos);
+
+        if (dist <= rayonDeDegats)
+        {
+            PlayerHealth.Instance.TakeDamage(degats);
+            Debug.Log("Player damaged by explosion (full height)");
         }
     }
 

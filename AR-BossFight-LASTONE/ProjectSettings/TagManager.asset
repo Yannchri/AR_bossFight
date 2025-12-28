@@ -30,6 +30,7 @@ TagManager:
   - QDSUIToggleCheckboxRadio
   - Shield
   - Boss
+  - PlayerBody
   layers:
   - Default
   - TransparentFX

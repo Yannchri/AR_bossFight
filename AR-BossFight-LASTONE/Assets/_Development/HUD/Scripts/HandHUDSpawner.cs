@@ -2,51 +2,62 @@
 
 public class HealthBarAccessorySpawner : MonoBehaviour
 {
+    [Header("References")]
+    public Transform handAnchor;          // LeftHandAnchor ou RightHandAnchor
     public GameObject healthBarPrefab;
 
+    [Header("Offsets")]
     public Vector3 positionOffset = new Vector3(0.06f, 0.02f, 0f);
-    public Vector3 rotationOffset = new Vector3(0f, 0f, 90f); // 90° LE LONG DU POIGNET
+    public Vector3 rotationOffset = new Vector3(0f, 0f, 90f);
 
-    private OVRSkeleton skeleton;
-    private GameObject spawnedHealthBar;
-    private bool hasSpawned = false;
-    private Transform wrist;
+    private bool spawned = false;
 
     void Start()
     {
-        skeleton = GetComponent<OVRSkeleton>();
+        Debug.Log("[HealthBarSpawner] Start");
     }
 
     void Update()
     {
-        if (!hasSpawned && skeleton != null && skeleton.IsInitialized)
-        {
-            AttachToWrist();
-        }
+        if (spawned || handAnchor == null)
+            return;
 
-        if (hasSpawned && spawnedHealthBar != null)
-        {
-            // POSITION RELATIVE AU POIGNET
-            spawnedHealthBar.transform.localPosition = positionOffset;
-
-            // ROTATION RELATIVE AU POIGNET ✅✅✅
-            spawnedHealthBar.transform.localRotation =
-                Quaternion.Euler(rotationOffset);
-        }
+        SpawnHUD();
     }
 
-    void AttachToWrist()
+    void SpawnHUD()
     {
-        foreach (var bone in skeleton.Bones)
-        {
-            if (bone.Id == OVRSkeleton.BoneId.Hand_WristRoot)
-            {
-                wrist = bone.Transform;
-                spawnedHealthBar = Instantiate(healthBarPrefab, wrist);
+        var hud = Instantiate(healthBarPrefab, handAnchor);
+        hud.name += "_RUNTIME";
 
-                hasSpawned = true;
-                break;
-            }
+        hud.transform.localPosition = positionOffset;
+        hud.transform.localRotation = Quaternion.Euler(rotationOffset);
+
+        Debug.Log(
+           $"[HealthBarSpawner] HUD instantiated\n" +
+           $"- Name: {hud.name}\n" +
+           $"- Parent: {hud.transform.parent.name}\n" +
+           $"- World Pos: {hud.transform.position}\n" +
+           $"- Local Pos: {hud.transform.localPosition}"
+       );
+
+        var ui = hud.GetComponentInChildren<PlayerHealthUI>(true);
+        Debug.Log("[HealthBarSpawner] PlayerHealthUI found = " + (ui != null));
+
+        if (ui != null && PlayerHealth.Instance != null)
+        {
+            PlayerHealth.Instance.RegisterUI(ui);
+            Debug.Log("[HealthBarSpawner] UI registered");
         }
+        else
+        {
+            if (ui == null)
+                Debug.LogError("[HealthBarSpawner] PlayerHealthUI NOT FOUND in prefab");
+
+            if (PlayerHealth.Instance == null)
+                Debug.LogError("[HealthBarSpawner] PlayerHealth.Instance NULL");
+        }
+
+        spawned = true;
     }
 }

@@ -1,11 +1,13 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayButtonAction : MonoBehaviour
 {
     [Header("UI Panels")]
     public GameObject mainMenuPanel;
     public GameObject aboutPanel;
+
+    //[Header("Scene")]
+    //public string gameSceneName = "Main_Quest_Build";
 
     void Start()
     {
@@ -17,7 +19,12 @@ public class PlayButtonAction : MonoBehaviour
     public void StartBtn()
     {
         Debug.Log("RAY SELECT OK");
-        SceneManager.LoadScene("Main_Quest_Build");
+
+        // Optionnel : cacher l’UI avant le fade
+        mainMenuPanel.SetActive(false);
+
+        VRSceneTransitionManager.Instance.FadeToScene("Main_Quest_Build");
+
     }
 
     // Bouton ABOUT
