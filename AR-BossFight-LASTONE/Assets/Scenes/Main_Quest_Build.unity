@@ -576,7 +576,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShieldAccessorySpawner
   shieldPrefab: {fileID: 6512680436455493012, guid: 80acecd740a7379418dac7b8c0c8049f, type: 3}
-  positionOffset: {x: -0.02, y: 0.03, z: -0.05}
+  positionOffset: {x: 0, y: -0.02, z: 0.1}
   rotationOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &410988747
 MonoBehaviour:
