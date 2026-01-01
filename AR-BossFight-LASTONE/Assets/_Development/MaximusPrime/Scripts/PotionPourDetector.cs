@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PotionPourDetector : MonoBehaviour
 {
@@ -18,6 +19,13 @@ public class PotionPourDetector : MonoBehaviour
     public float healAmount = 30f;
     public PlayerHealth playerHealth;
 
+    [Header("Disappear & Respawn")]
+    public float disappearDelay = 2f; // ⏱ delay before bottle disappears
+    public bool enableRespawn = true;
+    public float respawnDelay = 10f;
+    public float respawnRadius = 2f;
+    public float respawnMinDistance = 0.8f;
+
     [Header("Visual Liquid")]
     public Transform liquidObject;
     private float initialLiquidHeight;
@@ -34,11 +42,19 @@ public class PotionPourDetector : MonoBehaviour
     public GameObject dropletPrefab;
     public Transform pourPoint;
 
+    private Renderer[] cachedRenderers;
+    private Collider[] cachedColliders;
+
+    void Awake()
+    {
+        cachedRenderers = GetComponentsInChildren<Renderer>(true);
+        cachedColliders = GetComponentsInChildren<Collider>(true);
+    }
+
     void Start()
     {
         currentLiquid = Mathf.Clamp(currentLiquid, 0, maxLiquid);
 
-        // ✅ Auto-link PlayerHealth
         if (playerHealth == null)
             playerHealth = PlayerHealth.Instance;
 
@@ -48,7 +64,6 @@ public class PotionPourDetector : MonoBehaviour
         if (liquidObject != null)
         {
             initialLiquidHeight = liquidObject.localScale.y;
-
             liquidRenderer = liquidObject.GetComponent<Renderer>();
             if (liquidRenderer != null)
                 liquidBaseColor = liquidRenderer.material.color;
@@ -59,30 +74,22 @@ public class PotionPourDetector : MonoBehaviour
 
     void Update()
     {
-        // 🧪 Potion empty → heal player ONCE
+        // Potion empty → heal once → delayed disappear
         if (currentLiquid <= 0f)
         {
             currentLiquid = 0f;
 
             if (!liquidHidden)
             {
+                liquidHidden = true;
+
                 if (playerHealth != null)
                 {
-                    Debug.Log(
-                        $"<color=green>[Potion]</color> Potion empty → Healing player for {healAmount} HP"
-                    );
-
+                    Debug.Log($"<color=green>[Potion]</color> Potion empty → Healing player for {healAmount} HP");
                     playerHealth.Heal(healAmount);
                 }
-                else
-                {
-                    Debug.LogWarning("PotionPourDetector: PlayerHealth reference missing.");
-                }
 
-                if (liquidObject != null)
-                    liquidObject.gameObject.SetActive(false);
-
-                liquidHidden = true;
+                StartCoroutine(DisappearThenRespawn());
             }
 
             return;
@@ -94,7 +101,6 @@ public class PotionPourDetector : MonoBehaviour
         {
             float t = Mathf.InverseLerp(pourThreshold, maxPourAngle, angle);
             float currentPourRate = Mathf.Lerp(minPourRate, maxPourRate, t);
-
             TryPour(currentPourRate);
         }
     }
@@ -125,18 +131,10 @@ public class PotionPourDetector : MonoBehaviour
                 Random.Range(-0.08f, 0.08f)
             );
 
-            Vector3 direction =
-                (pourPoint.forward + Vector3.down * 0.4f + spread).normalized;
+            Vector3 direction = (pourPoint.forward + Vector3.down * 0.4f + spread).normalized;
 
-            rb.AddForce(
-                direction * Random.Range(dropletForceRange.x, dropletForceRange.y),
-                ForceMode.Impulse
-            );
-
-            rb.AddTorque(
-                Random.insideUnitSphere * dropletSpinForce,
-                ForceMode.Impulse
-            );
+            rb.AddForce(direction * Random.Range(dropletForceRange.x, dropletForceRange.y), ForceMode.Impulse);
+            rb.AddTorque(Random.insideUnitSphere * dropletSpinForce, ForceMode.Impulse);
         }
 
         Destroy(droplet, dropletLifetime);
@@ -146,7 +144,6 @@ public class PotionPourDetector : MonoBehaviour
     {
         float drainAmount = drainPerDroplet;
 
-        // 🐌 Slower last drops
         if (currentLiquid < drainPerDroplet * 2f)
             drainAmount *= 0.5f;
 
@@ -170,18 +167,31 @@ public class PotionPourDetector : MonoBehaviour
         Vector3 pos = liquidObject.localPosition;
         pos.y = -(initialLiquidHeight - scale.y) / 2f;
         liquidObject.localPosition = pos;
-
-        if (liquidRenderer != null)
-        {
-            Color c = liquidBaseColor;
-            c.a = liquidRenderer.material.color.a;
-            liquidRenderer.material.color = c;
-        }
     }
 
-    // 🔄 Optional refill support
-    public void Refill()
+    // =========================
+    // Delayed disappear + respawn
+    // =========================
+
+    IEnumerator DisappearThenRespawn()
     {
+        yield return new WaitForSeconds(disappearDelay);
+
+        SetPotionActive(false);
+
+        if (enableRespawn)
+            Invoke(nameof(Respawn), respawnDelay);
+    }
+
+    void Respawn()
+    {
+        Vector3 center = transform.position;
+        if (playerHealth != null)
+            center = playerHealth.GetPlayerPosition();
+
+        Vector2 rand = Random.insideUnitCircle.normalized * Random.Range(respawnMinDistance, respawnRadius);
+        transform.position = center + new Vector3(rand.x, 0f, rand.y);
+
         currentLiquid = maxLiquid;
         liquidHidden = false;
 
@@ -189,5 +199,17 @@ public class PotionPourDetector : MonoBehaviour
             liquidObject.gameObject.SetActive(true);
 
         UpdateLiquidVisual();
+        SetPotionActive(true);
+
+        Debug.Log($"<color=yellow>[Potion]</color> Respawned");
+    }
+
+    void SetPotionActive(bool isActive)
+    {
+        foreach (var r in cachedRenderers)
+            if (r != null) r.enabled = isActive;
+
+        foreach (var c in cachedColliders)
+            if (c != null) c.enabled = isActive;
     }
 }
