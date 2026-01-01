@@ -38,6 +38,13 @@ public class PotionPourDetector : MonoBehaviour
     {
         currentLiquid = Mathf.Clamp(currentLiquid, 0, maxLiquid);
 
+        // ✅ Auto-link PlayerHealth
+        if (playerHealth == null)
+            playerHealth = PlayerHealth.Instance;
+
+        if (playerHealth == null)
+            Debug.LogError("PotionPourDetector: PlayerHealth NOT found in scene!");
+
         if (liquidObject != null)
         {
             initialLiquidHeight = liquidObject.localScale.y;
@@ -52,7 +59,7 @@ public class PotionPourDetector : MonoBehaviour
 
     void Update()
     {
-        // Potion empty → heal player ONCE and stop
+        // 🧪 Potion empty → heal player ONCE
         if (currentLiquid <= 0f)
         {
             currentLiquid = 0f;
@@ -61,6 +68,10 @@ public class PotionPourDetector : MonoBehaviour
             {
                 if (playerHealth != null)
                 {
+                    Debug.Log(
+                        $"<color=green>[Potion]</color> Potion empty → Healing player for {healAmount} HP"
+                    );
+
                     playerHealth.Heal(healAmount);
                 }
                 else
@@ -100,6 +111,9 @@ public class PotionPourDetector : MonoBehaviour
 
     void SpawnDroplet()
     {
+        if (dropletPrefab == null || pourPoint == null)
+            return;
+
         GameObject droplet = Instantiate(dropletPrefab, pourPoint.position, Quaternion.identity);
 
         Rigidbody rb = droplet.GetComponent<Rigidbody>();
@@ -132,7 +146,7 @@ public class PotionPourDetector : MonoBehaviour
     {
         float drainAmount = drainPerDroplet;
 
-        // Slower last drops
+        // 🐌 Slower last drops
         if (currentLiquid < drainPerDroplet * 2f)
             drainAmount *= 0.5f;
 
@@ -165,7 +179,7 @@ public class PotionPourDetector : MonoBehaviour
         }
     }
 
-    // Optional refill support
+    // 🔄 Optional refill support
     public void Refill()
     {
         currentLiquid = maxLiquid;
