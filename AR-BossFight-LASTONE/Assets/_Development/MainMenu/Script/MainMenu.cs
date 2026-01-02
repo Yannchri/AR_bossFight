@@ -5,6 +5,7 @@ public class PlayButtonAction : MonoBehaviour
     [Header("UI Panels")]
     public GameObject mainMenuPanel;
     public GameObject aboutPanel;
+    public GameObject howToPlayPanel;
 
     //[Header("Scene")]
     //public string gameSceneName = "Main_Quest_Build";
@@ -13,6 +14,8 @@ public class PlayButtonAction : MonoBehaviour
     {
         aboutPanel.SetActive(false);
         mainMenuPanel.SetActive(true);
+        howToPlayPanel.SetActive(false);
+
     }
 
     // Bouton PLAY
@@ -39,5 +42,13 @@ public class PlayButtonAction : MonoBehaviour
     {
         aboutPanel.SetActive(false);
         mainMenuPanel.SetActive(true);
+        howToPlayPanel.SetActive(false);
     }
+
+    public void OpenHowToPlay()
+    {
+        mainMenuPanel.SetActive(false);
+        howToPlayPanel.SetActive(true);
+    }
+
 }
