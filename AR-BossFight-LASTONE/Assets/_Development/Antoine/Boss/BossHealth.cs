@@ -40,6 +40,7 @@ public class BossHealth : MonoBehaviour
         if (currentHealth <= 0) return;
 
         currentHealth -= damage;
+        Debug.Log($"Boss prend {damage} dégâts. HP = {currentHealth}/{maxHealth}");
         
         // Mise à jour visuelle
         UpdateHealthBar();
@@ -48,6 +49,12 @@ public class BossHealth : MonoBehaviour
         if (bossRenderer != null) StartCoroutine(FlashRed());
 
         if (currentHealth <= 0) Die();
+    }
+
+    // Méthode pour compatibilité avec les sorts (SpellProjectile utilise ApplyDamage)
+    public void ApplyDamage(float damage)
+    {
+        TakeDamage(damage);
     }
 
     void UpdateHealthBar()
@@ -59,17 +66,35 @@ public class BossHealth : MonoBehaviour
         }
     }
 
-    // ... (Garde tes fonctions Die et FlashRed comme avant) ...
     void Die()
     {
-        if (bossController != null) bossController.ChangeState(BossController.BossState.Dead);
+        Debug.Log("BOSS MORT !");
+        
+        // Changer l'état du boss
+        if (bossController != null) 
+            bossController.ChangeState(BossController.BossState.Dead);
+        
+        // Déclencher la victoire du joueur
+        if (GameManager.Instance != null)
+        {
+            Debug.Log("BOSS MORT - Changement d'état vers BossDead");
+            GameManager.Instance.SetState(GameState.BossDead);
+        }
+        
         Destroy(gameObject, 2f);
     }
     
     System.Collections.IEnumerator FlashRed()
     {
-        bossRenderer.material.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        bossRenderer.material.color = originalColor;
+        if (bossRenderer != null)
+        {
+            bossRenderer.material.color = Color.red;
+            yield return new WaitForSeconds(0.1f);
+            bossRenderer.material.color = originalColor;
+        }
     }
+
+    // Méthodes publiques utiles
+    public float GetCurrentHealth() => currentHealth;
+    public float GetHealthPercentage() => currentHealth / maxHealth;
 }

@@ -275,7 +275,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 0.2, y: 0.2, z: 20}
-  m_Center: {x: 0, y: -0.33, z: 10}
+  m_Center: {x: 0, y: 0.06, z: 10}
 --- !u!114 &8967947634570756039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -289,6 +289,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossLaserCollision
   damage: 50
+  headDetectionHeight: 0.3
 --- !u!1 &7264700666692320774
 GameObject:
   m_ObjectHideFlags: 0
@@ -480,8 +481,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.55, y: 0.7, z: 0.5}
+  m_Center: {x: 0, y: 0.3, z: 0}
 --- !u!114 &6439880522914118008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -508,6 +509,7 @@ MonoBehaviour:
   dashSpeed: 15
   dashOvershoot: 1
   dashPreparationTime: 1
+  dashDamage: 30
   currentRoom: {fileID: 0}
 --- !u!114 &1184854216461529215
 MonoBehaviour:
@@ -521,7 +523,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 463de79d90a4efc4891f2772f626f37d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossHealth
-  maxHealth: 100
+  maxHealth: 500
   healthCanvas: {fileID: 597109724304361603}
   healthBarImage: {fileID: 8048862615552477255}
   bossRenderer: {fileID: 0}
