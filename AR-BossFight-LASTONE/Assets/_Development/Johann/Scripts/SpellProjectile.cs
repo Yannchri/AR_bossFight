@@ -159,7 +159,7 @@ public class SpellProjectile : MonoBehaviour
             Collider[] hits = Physics.OverlapSphere(impactPos, explosionRadius, aoeHitLayers, QueryTriggerInteraction.Ignore);
             foreach (var hit in hits)
             {
-                Health h = hit.GetComponentInParent<Health>();
+                BossHealth h = hit.GetComponentInParent<BossHealth>();
                 if (h == null)
                     continue;
 
