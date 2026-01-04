@@ -7,6 +7,7 @@ public class BossHealth : MonoBehaviour
     [Header("Santé")]
     public float maxHealth = 100f; // float c'est mieux pour les divisions
     private float currentHealth;
+    private float initialBarWidth;
 
     [Header("Configuration UI")]
     public GameObject healthCanvas; // L'objet Canvas entier
@@ -20,10 +21,16 @@ public class BossHealth : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth;
-        bossController = GetComponent<BossController>();
-        if (bossRenderer != null) originalColor = bossRenderer.material.color;
 
-        UpdateHealthBar(); // Mise à jour au début
+        bossController = GetComponent<BossController>();
+
+        if (bossRenderer != null)
+            originalColor = bossRenderer.material.color;
+
+        if (healthBarImage != null)
+            initialBarWidth = healthBarImage.rectTransform.sizeDelta.x;
+
+        UpdateHealthBar();
     }
 
     void Update()
@@ -60,18 +67,20 @@ public class BossHealth : MonoBehaviour
 
     void UpdateHealthBar()
     {
-        if (healthBarImage != null)
-        {
-            // Calcul du pourcentage (ex: 0.5 pour 50%)
-            float healthPercentage = currentHealth / maxHealth;
-            healthBarImage.fillAmount = healthPercentage;
-            Debug.Log($"Health bar updated: {healthPercentage * 100f}% (fillAmount: {healthBarImage.fillAmount})");
-        }
-        else
+        if (healthBarImage == null)
         {
             Debug.LogWarning("healthBarImage is null! Cannot update health bar.");
+            return;
         }
+
+        float healthPercentage = Mathf.Clamp01(currentHealth / maxHealth);
+
+        RectTransform rt = healthBarImage.rectTransform;
+        rt.sizeDelta = new Vector2(initialBarWidth * healthPercentage, rt.sizeDelta.y);
+
+        Debug.Log($"Health bar updated (SLICED): {healthPercentage * 100f}% | width = {rt.sizeDelta.x}");
     }
+
 
     void Die()
     {
