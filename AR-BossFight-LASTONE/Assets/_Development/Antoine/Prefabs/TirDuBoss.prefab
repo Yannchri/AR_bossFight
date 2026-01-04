@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 2796827342378162907}
   - component: {fileID: 4815914358550952102}
   - component: {fileID: 5064520053859584567}
-  - component: {fileID: 1298674775424197668}
   - component: {fileID: 583971595457975034}
+  - component: {fileID: 1792562747033044455}
   m_Layer: 0
   m_Name: TirDuBoss
   m_TagString: Untagged
@@ -114,22 +114,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1298674775424197668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8263062722629253008}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb88c95f2b06ce947986371c27bba737, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CircleZoneAttack
-  tempsAvantExplosion: 2
-  dureeExplosion: 0.5
-  rayonDeDegats: 1
-  degats: 20
 --- !u!54 &583971595457975034
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -157,6 +141,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1792562747033044455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8263062722629253008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5d298c67ef5d5f4b80e16e41a53a3ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Fireball
+  damage: 10
 --- !u!1001 &143038503329579292
 PrefabInstance:
   m_ObjectHideFlags: 0

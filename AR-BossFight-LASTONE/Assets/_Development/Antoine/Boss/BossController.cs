@@ -36,6 +36,7 @@ public class BossController : MonoBehaviour
     public float dashSpeed = 20f;
     public float dashOvershoot = 5f;
     public float dashPreparationTime = 1.0f;
+    public float dashDamage = 30f;
 
     [Header("Réalité Mixte")]
     public MRUKRoom currentRoom;
@@ -248,12 +249,26 @@ public class BossController : MonoBehaviour
         // SÉCURITÉ : On ajoute un timer pour éviter que le while ne tourne à l'infini
         float safetyTimer = 0f;
         float maxDashDuration = 3.0f; // Sécurité de 3 secondes max
+        bool playerHit = false;
 
         // Boucle de mouvement
         while (Vector3.Distance(transform.position, finalTargetPos) > 1.0f && safetyTimer < maxDashDuration)
         {
             transform.position = Vector3.MoveTowards(transform.position, finalTargetPos, dashSpeed * Time.deltaTime);
             safetyTimer += Time.deltaTime;
+            if(!playerHit){
+                // Vérification de la distance au joueur pour infliger des dégâts
+                float distanceToPlayer = Vector3.Distance(transform.position, playerHead.position);
+                if (distanceToPlayer < 2.0f) // Seuil de distance pour toucher le joueur
+                {
+                    if (PlayerHealth.Instance != null)
+                    {
+                        PlayerHealth.Instance.TakeDamage(dashDamage);
+                        Debug.Log("Player damaged by DASH");
+                    }
+                    playerHit = true; // Pour ne pas infliger des dégâts multiples
+                }
+            }
             yield return null;
         }
 
