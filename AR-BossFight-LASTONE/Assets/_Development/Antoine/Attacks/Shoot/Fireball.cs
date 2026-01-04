@@ -15,7 +15,7 @@ public class Fireball : MonoBehaviour
         }
 
         // --- 2. JOUEUR ---
-        if (other.CompareTag("PlayerBody"))
+        if (other.CompareTag("Player"))
         { 
             if (PlayerHealth.Instance != null)
             {

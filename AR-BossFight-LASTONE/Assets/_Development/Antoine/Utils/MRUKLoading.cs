@@ -21,6 +21,8 @@ public class MRUKLoading : MonoBehaviour
     [SerializeField] private GameObject potionPrefab; // Ton prefab de potion
     [SerializeField] private int numberOfPotions = 3; // Combien de potions ?
     [SerializeField] private float potionOffset = 0.1f; // Petit décalage pour ne pas qu'elle soit dans le sol
+    [Header("Player Configuration")]
+    [SerializeField] private GameObject player;
 
     private bool sceneHasBeenLoaded = false;
     private MRUKRoom currentRoom;
@@ -42,12 +44,39 @@ public class MRUKLoading : MonoBehaviour
 
         if (currentRoom != null)
         {
+            TeleportPlayerToFloor();
             StartCoroutine(SpawnBossFromPrefab());
             SpawnPotions(); // --- NOUVEAU : On lance le spawn des potions
             
             if (loadingScreen != null) loadingScreen.SetActive(false);
         }
     }
+    private void TeleportPlayerToFloor()
+{
+    if (player == null || currentRoom == null) return;
+
+    LabelFilter filter = new LabelFilter(MRUKAnchor.SceneLabels.FLOOR);
+    if (currentRoom.GenerateRandomPositionOnSurface(MRUK.SurfaceType.FACING_UP, 0.5f, filter, out Vector3 spawnPos, out Vector3 spawnNormal))
+    {
+        // On déplace le joueur
+        player.transform.position = spawnPos + Vector3.up * 1.1f; // Un peu de marge au dessus du sol
+
+        // --- C'EST ICI QUE TOUT SE JOUE ---
+        // On réactive le CharacterController s'il existe
+        var controller = player.GetComponent<CharacterController>();
+        if (controller != null) controller.enabled = true;
+
+        // On réactive la physique
+        var rb = player.GetComponent<Rigidbody>();
+        if (rb != null) 
+        {
+            rb.isKinematic = false; // Le moteur physique reprend le contrôle
+            rb.useGravity = true;   // La gravité s'applique enfin
+        }
+        
+        Debug.Log("Physique du joueur activée après chargement du sol.");
+    }
+}
 
     // --- NOUVEAU : La fonction pour les potions ---
     private void SpawnPotions()
