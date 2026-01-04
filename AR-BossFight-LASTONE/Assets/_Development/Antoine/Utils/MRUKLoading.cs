@@ -21,6 +21,8 @@ public class MRUKLoading : MonoBehaviour
     [SerializeField] private GameObject potionPrefab; // Ton prefab de potion
     [SerializeField] private int numberOfPotions = 3; // Combien de potions ?
     [SerializeField] private float potionOffset = 0.1f; // Petit décalage pour ne pas qu'elle soit dans le sol
+    [Header("Player Configuration")]
+    [SerializeField] private GameObject player;
 
     private bool sceneHasBeenLoaded = false;
     private MRUKRoom currentRoom;
@@ -42,12 +44,34 @@ public class MRUKLoading : MonoBehaviour
 
         if (currentRoom != null)
         {
+            TeleportPlayerToFloor();
             StartCoroutine(SpawnBossFromPrefab());
             SpawnPotions(); // --- NOUVEAU : On lance le spawn des potions
             
             if (loadingScreen != null) loadingScreen.SetActive(false);
         }
     }
+    private void TeleportPlayerToFloor()
+{
+    if (player == null || currentRoom == null) return;
+
+    // On cherche une position sur le sol pour le joueur
+    LabelFilter filter = new LabelFilter(MRUKAnchor.SceneLabels.FLOOR);
+    if (currentRoom.GenerateRandomPositionOnSurface(MRUK.SurfaceType.FACING_UP, 0.5f, filter, out Vector3 spawnPos, out Vector3 spawnNormal))
+    {
+        // On désactive temporairement le CharacterController pour permettre la téléportation
+        var controller = player.GetComponent<CharacterController>();
+        if (controller != null) controller.enabled = false;
+
+        player.transform.position = spawnPos + Vector3.up * 0.1f; // On le place juste un peu au-dessus du sol
+
+        if (controller != null) controller.enabled = true;
+        
+        // On réactive la gravité du Rigidbody ici seulement !
+        var rb = player.GetComponent<Rigidbody>();
+        if (rb != null) rb.isKinematic = false; 
+    }
+}
 
     // --- NOUVEAU : La fonction pour les potions ---
     private void SpawnPotions()
