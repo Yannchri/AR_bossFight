@@ -300,7 +300,7 @@ public class PlayerSpellCaster : MonoBehaviour
                 // D tells: dégâts uniquement au tout début du beam
                 if (elapsed < 0.02f)
                 {
-                    Health h = hit.collider.GetComponentInParent<Health>();
+                    BossHealth h = hit.collider.GetComponentInParent<BossHealth>();
                     if (h != null)
                         h.ApplyDamage(lightningDamage);
 
