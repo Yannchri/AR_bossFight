@@ -175,7 +175,12 @@ public class BossController : MonoBehaviour
         // Petite pause pour laisser l'anim se mettre en place
         yield return new WaitForSeconds(0.5f);
 
-        transform.Rotate(Vector3.up, Random.Range(0f, 360f));
+        // Positionner le laser 90 degrés après le joueur pour qu'il puisse l'éviter
+        Vector3 directionToPlayer = (playerHead.position - transform.position).normalized;
+        float angleToPlayer = Mathf.Atan2(directionToPlayer.x, directionToPlayer.z) * Mathf.Rad2Deg;
+        float laserStartAngle = angleToPlayer + 90f; // 90 degrés après le joueur
+        transform.rotation = Quaternion.Euler(0, laserStartAngle, 0);
+        
         laserEmitterObject.SetActive(true);
 
         float timer = 0f;

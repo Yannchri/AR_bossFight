@@ -17,13 +17,15 @@ public class Fireball : MonoBehaviour
         // --- 2. JOUEUR ---
         if (other.CompareTag("PlayerBody"))
         { 
-            PlayerHealth.Instance.TakeDamage(damage);
-
-            Debug.Log("Player damaged by FIREBALL");
-        }
-        else
-        {
-            Debug.LogError("PlayerHealth.Instance NOT FOUND");
+            if (PlayerHealth.Instance != null)
+            {
+                PlayerHealth.Instance.TakeDamage(damage);
+                Debug.Log("Player damaged by FIREBALL");
+            }
+            else
+            {
+                Debug.LogError("PlayerHealth.Instance NOT FOUND");
+            }
         }
 
         // --- 3. NETTOYAGE ---
