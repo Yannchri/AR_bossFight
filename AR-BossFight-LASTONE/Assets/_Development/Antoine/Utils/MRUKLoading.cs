@@ -55,21 +55,26 @@ public class MRUKLoading : MonoBehaviour
 {
     if (player == null || currentRoom == null) return;
 
-    // On cherche une position sur le sol pour le joueur
     LabelFilter filter = new LabelFilter(MRUKAnchor.SceneLabels.FLOOR);
     if (currentRoom.GenerateRandomPositionOnSurface(MRUK.SurfaceType.FACING_UP, 0.5f, filter, out Vector3 spawnPos, out Vector3 spawnNormal))
     {
-        // On désactive temporairement le CharacterController pour permettre la téléportation
+        // On déplace le joueur
+        player.transform.position = spawnPos + Vector3.up * 1.1f; // Un peu de marge au dessus du sol
+
+        // --- C'EST ICI QUE TOUT SE JOUE ---
+        // On réactive le CharacterController s'il existe
         var controller = player.GetComponent<CharacterController>();
-        if (controller != null) controller.enabled = false;
-
-        player.transform.position = spawnPos + Vector3.up * 0.1f; // On le place juste un peu au-dessus du sol
-
         if (controller != null) controller.enabled = true;
-        
-        // On réactive la gravité du Rigidbody ici seulement !
+
+        // On réactive la physique
         var rb = player.GetComponent<Rigidbody>();
-        if (rb != null) rb.isKinematic = false; 
+        if (rb != null) 
+        {
+            rb.isKinematic = false; // Le moteur physique reprend le contrôle
+            rb.useGravity = true;   // La gravité s'applique enfin
+        }
+        
+        Debug.Log("Physique du joueur activée après chargement du sol.");
     }
 }
 
