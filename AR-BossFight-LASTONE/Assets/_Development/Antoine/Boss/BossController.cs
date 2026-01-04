@@ -201,7 +201,7 @@ public class BossController : MonoBehaviour
         yield return new WaitForSeconds(0.5f); // Zéroter la rotation de fin
     }
 
-    IEnumerator DashAttackRoutine()
+     IEnumerator DashAttackRoutine()
     {
         // --- PHASE 1 : PRÉPARATION ---
         if (bossAnimator) bossAnimator.SetTrigger("PrepareDash");
@@ -256,19 +256,22 @@ public class BossController : MonoBehaviour
         {
             transform.position = Vector3.MoveTowards(transform.position, finalTargetPos, dashSpeed * Time.deltaTime);
             safetyTimer += Time.deltaTime;
-            if(!playerHit){
-                // Vérification de la distance au joueur pour infliger des dégâts
+            
+            // Vérification de collision avec le joueur
+            if (!playerHit && playerHead != null)
+            {
                 float distanceToPlayer = Vector3.Distance(transform.position, playerHead.position);
                 if (distanceToPlayer < 2.0f) // Seuil de distance pour toucher le joueur
                 {
                     if (PlayerHealth.Instance != null)
                     {
                         PlayerHealth.Instance.TakeDamage(dashDamage);
-                        Debug.Log("Player damaged by DASH");
+                        Debug.Log($"Boss a infligé {dashDamage} dégâts au joueur pendant le DASH");
                     }
                     playerHit = true; // Pour ne pas infliger des dégâts multiples
                 }
             }
+            
             yield return null;
         }
 
