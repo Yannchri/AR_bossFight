@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI; // <--- INDISPENSABLE pour l'UI
+using UnityEngine.SceneManagement;
 
 public class BossHealth : MonoBehaviour
 {
@@ -62,13 +63,19 @@ public class BossHealth : MonoBehaviour
         if (healthBarImage != null)
         {
             // Calcul du pourcentage (ex: 0.5 pour 50%)
-            healthBarImage.fillAmount = currentHealth / maxHealth;
+            float healthPercentage = currentHealth / maxHealth;
+            healthBarImage.fillAmount = healthPercentage;
+            Debug.Log($"Health bar updated: {healthPercentage * 100f}% (fillAmount: {healthBarImage.fillAmount})");
+        }
+        else
+        {
+            Debug.LogWarning("healthBarImage is null! Cannot update health bar.");
         }
     }
 
     void Die()
     {
-        Debug.Log("BOSS MORT !");
+        Debug.Log("BOSS DIED");
         
         // Changer l'état du boss
         if (bossController != null) 
@@ -80,6 +87,9 @@ public class BossHealth : MonoBehaviour
             Debug.Log("BOSS MORT - Changement d'état vers BossDead");
             GameManager.Instance.SetState(GameState.BossDead);
         }
+        
+        // Charger la scène de victoire
+        SceneManager.LoadScene("Winner");
         
         Destroy(gameObject, 2f);
     }
