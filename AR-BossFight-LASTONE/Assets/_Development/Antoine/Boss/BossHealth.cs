@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI; // <--- INDISPENSABLE pour l'UI
+using UnityEngine.SceneManagement;
 
 public class BossHealth : MonoBehaviour
 {
     [Header("Santé")]
     public float maxHealth = 100f; // float c'est mieux pour les divisions
     private float currentHealth;
+    private float initialBarWidth;
 
     [Header("Configuration UI")]
     public GameObject healthCanvas; // L'objet Canvas entier
@@ -19,10 +21,16 @@ public class BossHealth : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth;
-        bossController = GetComponent<BossController>();
-        if (bossRenderer != null) originalColor = bossRenderer.material.color;
 
-        UpdateHealthBar(); // Mise à jour au début
+        bossController = GetComponent<BossController>();
+
+        if (bossRenderer != null)
+            originalColor = bossRenderer.material.color;
+
+        if (healthBarImage != null)
+            initialBarWidth = healthBarImage.rectTransform.sizeDelta.x;
+
+        UpdateHealthBar();
     }
 
     void Update()
@@ -59,16 +67,24 @@ public class BossHealth : MonoBehaviour
 
     void UpdateHealthBar()
     {
-        if (healthBarImage != null)
+        if (healthBarImage == null)
         {
-            // Calcul du pourcentage (ex: 0.5 pour 50%)
-            healthBarImage.fillAmount = currentHealth / maxHealth;
+            Debug.LogWarning("healthBarImage is null! Cannot update health bar.");
+            return;
         }
+
+        float healthPercentage = Mathf.Clamp01(currentHealth / maxHealth);
+
+        RectTransform rt = healthBarImage.rectTransform;
+        rt.sizeDelta = new Vector2(initialBarWidth * healthPercentage, rt.sizeDelta.y);
+
+        Debug.Log($"Health bar updated (SLICED): {healthPercentage * 100f}% | width = {rt.sizeDelta.x}");
     }
+
 
     void Die()
     {
-        Debug.Log("BOSS MORT !");
+        Debug.Log("BOSS DIED");
         
         // Changer l'état du boss
         if (bossController != null) 
@@ -80,6 +96,9 @@ public class BossHealth : MonoBehaviour
             Debug.Log("BOSS MORT - Changement d'état vers BossDead");
             GameManager.Instance.SetState(GameState.BossDead);
         }
+        
+        // Charger la scène de victoire
+        SceneManager.LoadScene("Winner");
         
         Destroy(gameObject, 2f);
     }

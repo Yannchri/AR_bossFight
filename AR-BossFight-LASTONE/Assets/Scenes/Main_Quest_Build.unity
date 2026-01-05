@@ -166,6 +166,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 3570011799251551763, guid: 74b4bef5ce3bd4e449de09b29236988c, type: 3}
+      propertyPath: SceneSettings.DataSource
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7790135914350458241, guid: 74b4bef5ce3bd4e449de09b29236988c, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.70846
@@ -216,17 +220,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3570011799251551763, guid: 74b4bef5ce3bd4e449de09b29236988c, type: 3}
   m_PrefabInstance: {fileID: 306619900}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 306619902}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de27d7f2f20024e18898941292d6c164, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &306619902 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1010235576183485152, guid: 74b4bef5ce3bd4e449de09b29236988c, type: 3}
-  m_PrefabInstance: {fileID: 306619900}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &326339077
 GameObject:
   m_ObjectHideFlags: 0
@@ -1505,13 +1504,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 306619901}
     - target: {fileID: 7877374543706198464, guid: 43162bf14a4567a49a2b077c61dde538, type: 3}
+      propertyPath: potionOffset
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7877374543706198464, guid: 43162bf14a4567a49a2b077c61dde538, type: 3}
       propertyPath: potionPrefab
       value: 
-      objectReference: {fileID: 5214456198945484709, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
+      objectReference: {fileID: 7619293148448215803, guid: 2697d6762e110264fa00203c9831a0ef, type: 3}
     - target: {fileID: 7877374543706198464, guid: 43162bf14a4567a49a2b077c61dde538, type: 3}
       propertyPath: loadingScreen
       value: 
-      objectReference: {fileID: 306619902}
+      objectReference: {fileID: 0}
+    - target: {fileID: 7877374543706198464, guid: 43162bf14a4567a49a2b077c61dde538, type: 3}
+      propertyPath: numberOfPotions
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1919,6 +1926,10 @@ PrefabInstance:
       propertyPath: _centerEyeCamera
       value: 
       objectReference: {fileID: 1897283674}
+    - target: {fileID: 3903482225804038112, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3903482225804038116, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
       propertyPath: m_Layer
       value: 0
@@ -2046,7 +2057,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.2
+  m_Radius: 0.3
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!20 &1897283674 stripped
 Camera:

@@ -4,35 +4,35 @@ using UnityEngine;
 public class SpellProjectile : MonoBehaviour
 {
     [Header("Safety / Arming")]
-    [Tooltip("Temps pendant lequel le projectile ne peut PAS déclencher d'impact après son spawn.")]
+    [Tooltip("Temps pendant lequel le projectile ne peut PAS dï¿½clencher d'impact aprï¿½s son spawn.")]
     public float armDelay = 0.15f;
 
-    [Tooltip("Distance minimale à parcourir avant de pouvoir impacter (sécurité complémentaire).")]
+    [Tooltip("Distance minimale ï¿½ parcourir avant de pouvoir impacter (sï¿½curitï¿½ complï¿½mentaire).")]
     public float minTravelDistanceToArm = 0.10f;
 
-    [Tooltip("Si activé, le projectile ignore les collisions avec les layers masqués (utile pour Player/RoomScale).")]
+    [Tooltip("Si activï¿½, le projectile ignore les collisions avec les layers masquï¿½s (utile pour Player/RoomScale).")]
     public bool useCollisionLayerMask = true;
 
-    [Tooltip("Layers autorisés à déclencher un impact (tout le reste est ignoré).")]
-    public LayerMask impactLayers = ~0; // Everything par défaut
+    [Tooltip("Layers autorisï¿½s ï¿½ dï¿½clencher un impact (tout le reste est ignorï¿½).")]
+    public LayerMask impactLayers = ~0; // Everything par dï¿½faut
 
     [Header("Impact Settings")]
     public GameObject impactEffectPrefab;
-    public float lifeTime = 5f; // sécurité : au cas où ça ne touche rien
+    public float lifeTime = 5f; // sï¿½curitï¿½ : au cas oï¿½ ï¿½a ne touche rien
 
     [Header("Damage Settings")]
     public float directDamage = 0f;
 
-    [Tooltip("Activer un DOT (dégâts sur la durée) sur la cible touchée.")]
+    [Tooltip("Activer un DOT (dï¿½gï¿½ts sur la durï¿½e) sur la cible touchï¿½e.")]
     public bool enableDot = false;
 
-    [Tooltip("Dégâts totaux du DOT (par ex. 30 pour faire 10/10/10).")]
+    [Tooltip("Dï¿½gï¿½ts totaux du DOT (par ex. 30 pour faire 10/10/10).")]
     public float dotTotalDamage = 0f;
 
-    [Tooltip("Durée totale du DOT en secondes (par ex. 3s).")]
+    [Tooltip("Durï¿½e totale du DOT en secondes (par ex. 3s).")]
     public float dotDuration = 0f;
 
-    [Tooltip("Nombre de ticks de dégâts (par ex. 3 ticks : 10/10/10).")]
+    [Tooltip("Nombre de ticks de dï¿½gï¿½ts (par ex. 3 ticks : 10/10/10).")]
     public int dotTicks = 0;
 
     [Header("Explosion Settings (AOE)")]
@@ -41,11 +41,11 @@ public class SpellProjectile : MonoBehaviour
     [Tooltip("Rayon de l'explosion autour du point d'impact.")]
     public float explosionRadius = 1.5f;
 
-    [Tooltip("Facteur de dégâts directs pour les cibles dans l'AOE (0.5 = 50%).")]
+    [Tooltip("Facteur de dï¿½gï¿½ts directs pour les cibles dans l'AOE (0.5 = 50%).")]
     [Range(0f, 1f)]
     public float explosionDirectDamageFactor = 0.5f;
 
-    [Tooltip("Facteur de dégâts du DOT pour les cibles dans l'AOE (0.5 = 50%).")]
+    [Tooltip("Facteur de dï¿½gï¿½ts du DOT pour les cibles dans l'AOE (0.5 = 50%).")]
     [Range(0f, 1f)]
     public float explosionDotDamageFactor = 0.5f;
 
@@ -57,7 +57,7 @@ public class SpellProjectile : MonoBehaviour
     public float impactScaleFactor = 1.0f;
 
     [Header("AOE Filtering (recommended)")]
-    [Tooltip("Layers pris en compte par l'OverlapSphere (évite de toucher RoomScale / Player si tu ne veux pas).")]
+    [Tooltip("Layers pris en compte par l'OverlapSphere (ï¿½vite de toucher RoomScale / Player si tu ne veux pas).")]
     public LayerMask aoeHitLayers = ~0;
 
     private bool _armed;
@@ -77,7 +77,7 @@ public class SpellProjectile : MonoBehaviour
 
     private IEnumerator ArmAfterDelay()
     {
-        // Délai minimal
+        // Dï¿½lai minimal
         if (armDelay > 0f)
             yield return new WaitForSeconds(armDelay);
 
@@ -86,7 +86,7 @@ public class SpellProjectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // 1) Ne pas impacter tant qu'on n'est pas "armé"
+        // 1) Ne pas impacter tant qu'on n'est pas "armï¿½"
         if (!_armed)
             return;
 
@@ -98,13 +98,13 @@ public class SpellProjectile : MonoBehaviour
                 return;
         }
 
-        // 3) Filtre de layer (optionnel mais très utile)
+        // 3) Filtre de layer (optionnel mais trï¿½s utile)
         if (useCollisionLayerMask)
         {
             int otherLayerMask = 1 << collision.gameObject.layer;
             if ((impactLayers.value & otherLayerMask) == 0)
             {
-                // Layer non autorisé => on ignore ce contact
+                // Layer non autorisï¿½ => on ignore ce contact
                 return;
             }
         }
@@ -136,20 +136,20 @@ public class SpellProjectile : MonoBehaviour
             }
         }
 
-        // Cible principale (celle touchée directement)
-        Health mainTarget = collision.collider.GetComponentInParent<Health>();
+        // Cible principale (le boss)
+        BossHealth mainTarget = collision.collider.GetComponentInParent<BossHealth>();
         if (mainTarget != null)
         {
-            // Dégâts directs sur la cible principale
+            // DÃ©gÃ¢ts directs sur le boss
             if (directDamage > 0f)
                 mainTarget.ApplyDamage(directDamage);
 
-            // DOT sur la cible principale
+            // DOT sur le boss
             if (enableDot && dotTotalDamage > 0f && dotDuration > 0f && dotTicks > 0)
             {
                 float tickDamage = dotTotalDamage / dotTicks;
                 float tickInterval = dotDuration / dotTicks;
-                mainTarget.StartCoroutine(ApplyDotOverTime(mainTarget, tickDamage, tickInterval, dotTicks));
+                StartCoroutine(ApplyDotOverTime(mainTarget, tickDamage, tickInterval, dotTicks));
             }
         }
 
@@ -159,15 +159,15 @@ public class SpellProjectile : MonoBehaviour
             Collider[] hits = Physics.OverlapSphere(impactPos, explosionRadius, aoeHitLayers, QueryTriggerInteraction.Ignore);
             foreach (var hit in hits)
             {
-                Health h = hit.GetComponentInParent<Health>();
+                BossHealth h = hit.GetComponentInParent<BossHealth>();
                 if (h == null)
                     continue;
 
-                // On évite de doubler les dégâts sur la cible principale
+                // On ï¿½vite de doubler les dï¿½gï¿½ts sur la cible principale
                 if (h == mainTarget)
                     continue;
 
-                // Dégâts directs de zone
+                // Dï¿½gï¿½ts directs de zone
                 float aoeDirectDamage = directDamage * explosionDirectDamageFactor;
                 if (aoeDirectDamage > 0f)
                     h.ApplyDamage(aoeDirectDamage);
@@ -187,7 +187,7 @@ public class SpellProjectile : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private static IEnumerator ApplyDotOverTime(Health target, float tickDamage, float interval, int tickCount)
+    private IEnumerator ApplyDotOverTime(BossHealth target, float tickDamage, float interval, int tickCount)
     {
         for (int i = 0; i < tickCount; i++)
         {
