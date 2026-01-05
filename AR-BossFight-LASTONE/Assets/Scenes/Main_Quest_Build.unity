@@ -1504,12 +1504,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 306619901}
     - target: {fileID: 7877374543706198464, guid: 43162bf14a4567a49a2b077c61dde538, type: 3}
+      propertyPath: potionOffset
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7877374543706198464, guid: 43162bf14a4567a49a2b077c61dde538, type: 3}
       propertyPath: potionPrefab
       value: 
-      objectReference: {fileID: 5214456198945484709, guid: df3f374c843adc54a83bbcd5db0ad872, type: 3}
+      objectReference: {fileID: 7619293148448215803, guid: 2697d6762e110264fa00203c9831a0ef, type: 3}
     - target: {fileID: 7877374543706198464, guid: 43162bf14a4567a49a2b077c61dde538, type: 3}
       propertyPath: loadingScreen
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7877374543706198464, guid: 43162bf14a4567a49a2b077c61dde538, type: 3}
+      propertyPath: numberOfPotions
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
