@@ -1,43 +1,51 @@
 using UnityEngine;
-using UnityEngine.UI; // <--- INDISPENSABLE pour l'UI
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class BossHealth : MonoBehaviour
 {
     [Header("Santé")]
-    public float maxHealth = 100f; // float c'est mieux pour les divisions
+    public float maxHealth = 100f;
     private float currentHealth;
     private float initialBarWidth;
+    private bool isDead = false; // Sécurité pour ne pas mourir 2 fois
+
+    [Header("Références (Auto-détectées si vides)")]
+    public Animator animator;         // On va le trouver tout seul
+    public BossController bossController; // Pour couper le cerveau
 
     [Header("Configuration UI")]
-    public GameObject healthCanvas; // L'objet Canvas entier
-    public Image healthBarImage;    // L'image ROUGE qui va diminuer
+    public GameObject healthCanvas;
+    public Image healthBarImage;
 
-    [Header("Feedback")]
+    [Header("Feedback Visuel")]
     public Renderer bossRenderer;
     private Color originalColor;
-    private BossController bossController;
 
     void Start()
     {
         currentHealth = maxHealth;
 
-        bossController = GetComponent<BossController>();
+        // --- 1. L'ASTUCE MAGIQUE ---
+        // Si tu n'as pas rempli la case Animator, le script fouille dans les ENFANTS pour le trouver
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
 
-        if (bossRenderer != null)
-            originalColor = bossRenderer.material.color;
+        // Idem pour le contrôleur
+        if (bossController == null)
+            bossController = GetComponent<BossController>();
 
-        if (healthBarImage != null)
-            initialBarWidth = healthBarImage.rectTransform.sizeDelta.x;
+        // Init visuelle
+        if (bossRenderer != null) originalColor = bossRenderer.material.color;
+        if (healthBarImage != null) initialBarWidth = healthBarImage.rectTransform.sizeDelta.x;
 
         UpdateHealthBar();
     }
 
     void Update()
     {
-        // ASTUCE : On force la barre de vie à regarder la caméra du joueur
-        // Sinon elle tourne avec le boss et on ne la voit plus !
-        if (healthCanvas != null)
+        if (healthCanvas != null && Camera.main != null)
         {
             healthCanvas.transform.LookAt(Camera.main.transform);
         }
@@ -45,65 +53,64 @@ public class BossHealth : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        if (currentHealth <= 0) return;
+        if (isDead) return; // On ne tape pas un mort
 
         currentHealth -= damage;
-        Debug.Log($"Boss prend {damage} dégâts. HP = {currentHealth}/{maxHealth}");
-        
-        // Mise à jour visuelle
         UpdateHealthBar();
-        
-        // Clignotement
+
+        // Effet rouge
         if (bossRenderer != null) StartCoroutine(FlashRed());
 
-        if (currentHealth <= 0) Die();
+        // Vérification de la mort
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
     }
 
-    // Méthode pour compatibilité avec les sorts (SpellProjectile utilise ApplyDamage)
-    public void ApplyDamage(float damage)
+    // Pour compatibilité avec tes sorts
+    public void ApplyDamage(float damage) => TakeDamage(damage);
+
+    void Die()
     {
-        TakeDamage(damage);
+        if (isDead) return;
+        isDead = true;
+
+        Debug.Log("💀 LE BOSS EST MORT !");
+
+        // 1. On lance l'animation (Grâce au GetComponentInChildren, ça marche !)
+        if (animator != null)
+            animator.SetTrigger("Die");
+
+        // 2. On coupe le cerveau immédiatement
+        if (bossController != null)
+            bossController.ChangeState(BossController.BossState.Dead);
+
+        // 3. On informe le GameManager (si tu en as un)
+        // if (GameManager.Instance != null) GameManager.Instance.SetState(GameState.BossDead);
+
+        // 4. On lance la séquence de fin (Attente + Victoire)
+        StartCoroutine(VictorySequence());
+    }
+
+    IEnumerator VictorySequence()
+    {
+        // On attend 4 secondes (le temps que le boss tombe au sol)
+        yield return new WaitForSeconds(4.0f);
+
+        // On charge la scène de victoire
+        SceneManager.LoadScene("Winner");
     }
 
     void UpdateHealthBar()
     {
-        if (healthBarImage == null)
-        {
-            Debug.LogWarning("healthBarImage is null! Cannot update health bar.");
-            return;
-        }
-
+        if (healthBarImage == null) return;
         float healthPercentage = Mathf.Clamp01(currentHealth / maxHealth);
-
         RectTransform rt = healthBarImage.rectTransform;
         rt.sizeDelta = new Vector2(initialBarWidth * healthPercentage, rt.sizeDelta.y);
-
-        Debug.Log($"Health bar updated (SLICED): {healthPercentage * 100f}% | width = {rt.sizeDelta.x}");
     }
 
-
-    void Die()
-    {
-        Debug.Log("BOSS DIED");
-        
-        // Changer l'état du boss
-        if (bossController != null) 
-            bossController.ChangeState(BossController.BossState.Dead);
-        
-        // Déclencher la victoire du joueur
-        if (GameManager.Instance != null)
-        {
-            Debug.Log("BOSS MORT - Changement d'état vers BossDead");
-            GameManager.Instance.SetState(GameState.BossDead);
-        }
-        
-        // Charger la scène de victoire
-        SceneManager.LoadScene("Winner");
-        
-        Destroy(gameObject, 2f);
-    }
-    
-    System.Collections.IEnumerator FlashRed()
+    IEnumerator FlashRed()
     {
         if (bossRenderer != null)
         {
@@ -112,8 +119,4 @@ public class BossHealth : MonoBehaviour
             bossRenderer.material.color = originalColor;
         }
     }
-
-    // Méthodes publiques utiles
-    public float GetCurrentHealth() => currentHealth;
-    public float GetHealthPercentage() => currentHealth / maxHealth;
 }
