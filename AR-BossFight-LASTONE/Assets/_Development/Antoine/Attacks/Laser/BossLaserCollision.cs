@@ -4,13 +4,28 @@ public class BossLaserCollision : MonoBehaviour
 {
     [SerializeField] float damage = 50;
     [SerializeField] float headDetectionHeight = 0.3f; // Tolérance de hauteur pour la détection de la tête
+    [SerializeField] float headDetectionRadius = 0.2f; // Tolérance de distance horizontale pour la détection de la tête
     bool hasHitPlayer = false;
     private OVRCameraRig playerCameraRig;
+    private Transform laserOrigin; // Pour obtenir l'origine du laser
 
     void Start()
     {
         // Trouver la tête du joueur au démarrage
         playerCameraRig = FindFirstObjectByType<OVRCameraRig>();
+        
+        // Trouver l'origine du laser (typiquement un Transform enfant nommé "LaserOrigin" ou similaire)
+        // On cherche dans le parent ou le même objet
+        BossLaserAuto laserAuto = GetComponentInParent<BossLaserAuto>();
+        if (laserAuto != null && laserAuto.laserOrigin != null)
+        {
+            laserOrigin = laserAuto.laserOrigin;
+        }
+        else
+        {
+            // Fallback : utiliser le parent direct ou cet objet
+            laserOrigin = transform.parent != null ? transform.parent : transform;
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -54,6 +69,36 @@ public class BossLaserCollision : MonoBehaviour
         if (Mathf.Abs(laserHeight - headHeight) > headDetectionHeight)
         {
             return false;
+        }
+
+        // NOUVELLE VÉRIFICATION : Le joueur doit être dans l'axe du rayon laser
+        // On vérifie que la tête est proche de la ligne entre l'origine du laser et la direction du laser
+        if (laserOrigin != null)
+        {
+            Vector3 laserDirection = transform.forward; // Direction du laser (supposant que le collider pointe dans cette direction)
+            Vector3 toHead = headTransform.position - laserOrigin.position;
+            
+            // Projeter la position de la tête sur l'axe du laser
+            float projectionLength = Vector3.Dot(toHead, laserDirection);
+            
+            // Si la tête est derrière l'origine du laser, elle n'est pas touchée
+            if (projectionLength < 0)
+            {
+                return false;
+            }
+            
+            // Calculer le point le plus proche sur la ligne du laser
+            Vector3 closestPointOnLaser = laserOrigin.position + laserDirection * projectionLength;
+            
+            // Calculer la distance perpendiculaire entre la tête et la ligne du laser
+            float distanceFromLaserLine = Vector3.Distance(headTransform.position, closestPointOnLaser);
+            
+            // Si la tête est trop loin de l'axe du laser, elle n'est pas touchée
+            if (distanceFromLaserLine > headDetectionRadius)
+            {
+                Debug.Log($"Laser miss: Head is {distanceFromLaserLine:F2}m from laser axis (max allowed: {headDetectionRadius:F2}m)");
+                return false;
+            }
         }
 
         return true;
