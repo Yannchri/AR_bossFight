@@ -369,7 +369,7 @@ MonoBehaviour:
     m_Bits: 8
   impactEffectPrefab: {fileID: 5662174710021345662}
   lifeTime: 5
-  directDamage: 20
+  directDamage: 50
   enableDot: 1
   dotTotalDamage: 30
   dotDuration: 3

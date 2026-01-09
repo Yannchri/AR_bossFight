@@ -6,6 +6,9 @@ public class BossLaserCollision : MonoBehaviour
     [SerializeField] float headDetectionHeight = 0.3f; // Tolérance de hauteur pour la détection de la tête
     bool hasHitPlayer = false;
     private OVRCameraRig playerCameraRig;
+    [SerializeField] float laserRange = 50f;
+    [SerializeField] LayerMask playerLayer;
+    [SerializeField] Transform laserOrigin;
 
     void Start()
     {
@@ -37,26 +40,27 @@ public class BossLaserCollision : MonoBehaviour
 
     bool IsLaserHittingHead()
     {
-        // Si on n'a pas trouvé la tête, chercher Camera.main comme fallback
-        Transform headTransform = playerCameraRig != null ? playerCameraRig.centerEyeAnchor : Camera.main?.transform;
+        if (laserOrigin == null)
+            laserOrigin = transform;
 
-        if (headTransform == null)
+        Vector3 direction = laserOrigin.forward;
+
+        Ray ray = new Ray(laserOrigin.position, direction);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, laserRange, playerLayer))
         {
-            Debug.LogWarning("Could not find player head for laser detection");
-            return false;
+            // Vérifie qu'on touche bien la tête
+            if (hit.transform == Camera.main.transform ||
+                hit.transform.IsChildOf(Camera.main.transform))
+            {
+                Debug.DrawLine(ray.origin, hit.point, Color.red);
+                return true;
+            }
         }
 
-        // Vérifier que le laser est à la bonne hauteur (hauteur de la tête)
-        float laserHeight = transform.position.y;
-        float headHeight = headTransform.position.y;
-        
-        // Le laser doit être approximativement à la hauteur de la tête
-        if (Mathf.Abs(laserHeight - headHeight) > headDetectionHeight)
-        {
-            return false;
-        }
-
-        return true;
+        Debug.DrawLine(ray.origin, ray.origin + direction * laserRange, Color.green);
+        return false;
     }
 
     // Optionnel : reset si le laser se désactive
