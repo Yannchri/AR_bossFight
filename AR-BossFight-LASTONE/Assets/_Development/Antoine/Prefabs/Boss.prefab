@@ -290,6 +290,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossLaserCollision
   damage: 40
   headDetectionHeight: 0.4
+  laserRange: 50
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  laserOrigin: {fileID: 0}
 --- !u!1 &7264700666692320774
 GameObject:
   m_ObjectHideFlags: 0
@@ -525,6 +530,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossHealth
   maxHealth: 500
+  animator: {fileID: 0}
+  bossController: {fileID: 0}
   healthCanvas: {fileID: 597109724304361603}
   healthBarImage: {fileID: 8048862615552477255}
   bossRenderer: {fileID: 0}

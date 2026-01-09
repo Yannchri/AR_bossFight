@@ -6,9 +6,6 @@ public class BossLaserCollision : MonoBehaviour
     [SerializeField] float headDetectionHeight = 0.3f; // Tolérance de hauteur pour la détection de la tête
     bool hasHitPlayer = false;
     private OVRCameraRig playerCameraRig;
-    [SerializeField] float laserRange = 50f;
-    [SerializeField] LayerMask playerLayer;
-    [SerializeField] Transform laserOrigin;
 
     void Start()
     {
@@ -40,27 +37,26 @@ public class BossLaserCollision : MonoBehaviour
 
     bool IsLaserHittingHead()
     {
-        if (laserOrigin == null)
-            laserOrigin = transform;
+        // Si on n'a pas trouvé la tête, chercher Camera.main comme fallback
+        Transform headTransform = playerCameraRig != null ? playerCameraRig.centerEyeAnchor : Camera.main?.transform;
 
-        Vector3 direction = laserOrigin.forward;
-
-        Ray ray = new Ray(laserOrigin.position, direction);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, laserRange, playerLayer))
+        if (headTransform == null)
         {
-            // Vérifie qu'on touche bien la tête
-            if (hit.transform == Camera.main.transform ||
-                hit.transform.IsChildOf(Camera.main.transform))
-            {
-                Debug.DrawLine(ray.origin, hit.point, Color.red);
-                return true;
-            }
+            Debug.LogWarning("Could not find player head for laser detection");
+            return false;
         }
 
-        Debug.DrawLine(ray.origin, ray.origin + direction * laserRange, Color.green);
-        return false;
+        // Vérifier que le laser est à la bonne hauteur (hauteur de la tête)
+        float laserHeight = transform.position.y;
+        float headHeight = headTransform.position.y;
+
+        // Le laser doit être approximativement à la hauteur de la tête
+        if (Mathf.Abs(laserHeight - headHeight) > headDetectionHeight)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     // Optionnel : reset si le laser se désactive
