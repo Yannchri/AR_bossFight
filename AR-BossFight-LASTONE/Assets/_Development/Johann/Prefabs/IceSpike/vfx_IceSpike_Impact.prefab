@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4500458961750029358}
   - component: {fileID: 8152014506889565942}
   - component: {fileID: 3326893258670971429}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BrightHold
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4905,7 +4905,7 @@ GameObject:
   - component: {fileID: 5521277632010768499}
   - component: {fileID: 6280281539998945384}
   - component: {fileID: 8763340833693183750}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: vfx_IceSpike_Impact
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9802,7 +9802,7 @@ GameObject:
   - component: {fileID: 3049932579906995800}
   - component: {fileID: 2540689484080606321}
   - component: {fileID: 5843507049455017806}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Darkback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14696,7 +14696,7 @@ GameObject:
   - component: {fileID: 3733268581563416478}
   - component: {fileID: 7908860651127451949}
   - component: {fileID: 3629607765504587410}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
